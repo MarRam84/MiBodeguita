@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <section class="dashboard" id="dashboardInventario">
+        <div class="card">
+            <i class="fas fa-box-open"></i>
+            <div>
+                Total de productos: <strong><span id="totalProductos">0</span></strong>
+            </div>
+        </div>
+        <div class="card">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                Stock crítico: <strong><span id="stockCritico">0</span></strong>
+            </div>
+        </div>
+        <div class="card">
+            <i class="fas fa-history"></i>
+            <div>
+                Últimos movimientos: <strong><span id="ultimosMovimientos">0</span></strong>
+            </div>
+        </div>
+        <div class="card">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>
+                Próximos a vencer: <strong><span id="proximosAVencer">0</span></strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="inventory-table" id="tablaInventario">
+        <div class="table-actions">
+            <button id="btnAgregar"><i class="fas fa-plus"></i> Agregar producto</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Ubicación</th>
+                    <th>Ingreso</th>
+                    <th>Vencimiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaProductos">
+                <!-- Aquí se insertarán las filas de productos -->
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Función para cargar los productos desde la API
+            function cargarProductos() {
+                fetch('http://localhost:3000/api/productos')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tablaProductos = document.getElementById('tablaProductos');
+                        tablaProductos.innerHTML = ''; // Limpiar la tabla
+
+                        let totalProductos = 0;
+                        let stockCritico = 0;
+                        let proximosAVencer = 0;
+
+                        data.forEach(producto => {
+                            totalProductos++;
+
+                            // Crear fila de la tabla
+                            const fila = document.createElement('tr');
+                            fila.innerHTML = `
+                                <td>${producto.nombre}</td>
+                                <td>${producto.categoria}</td>
+                                <td>${producto.cantidad}</td>
+                                <td>${producto.ubicacion}</td>
+                                <td>${producto.ingreso}</td>
+                                <td>${producto.vencimiento}</td>
+                                <td>
+                                    <button class="btn-editar"><i class="fas fa-edit"></i> Editar</button>
+                                    <button class="btn-eliminar"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                                </td>
+                            `;
+                            tablaProductos.appendChild(fila);
+                        });
+
+                        // Actualizar los valores en los cards
+                        document.getElementById('totalProductos').textContent = totalProductos;
+                        document.getElementById('stockCritico').textContent = stockCritico;
+                        document.getElementById('ultimosMovimientos').textContent = 15; // Valor estático
+                        document.getElementById('proximosAVencer').textContent = proximosAVencer;
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los productos:', error);
+                        document.getElementById('tablaProductos').innerHTML = '<tr><td colspan="7">Error al cargar los productos</td></tr>';
+                    });
+            }
+
+            cargarProductos(); // Cargar los productos al cargar la página
+
+            // Obtener el botón "Agregar producto"
+            const btnAgregar = document.getElementById('btnAgregar');
+
+            // Agregar un event listener al botón
+            btnAgregar.addEventListener('click', function () {
+                // Cargar el formulario "agregar-producto.html" en el modal
+                fetch('agregar-producto.html')
+                    .then(response => response.text())
+                    .then(data => {
+                        // Mostrar el modal con el formulario
+                        document.getElementById('modalTitle').textContent = 'Agregar Producto';
+                        document.getElementById('modalBody').innerHTML = data;
+                        document.getElementById('modal').classList.remove('hidden');
+
+                        // Agregar event listener al formulario dentro del modal
+                        const formAgregarProducto = document.getElementById('formAgregarProducto');
+                        formAgregarProducto.addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            // Obtener los valores del formulario
+                            const nombre = document.getElementById('nombre').value;
+                            const categoria = document.getElementById('categoria').value;
+                            const cantidad = document.getElementById('cantidad').value;
+                            const ubicacion = document.getElementById('ubicacion').value;
+                            const ingreso = document.getElementById('ingreso').value;
+                            const vencimiento = document.getElementById('vencimiento').value;
+
+                            // Crear un objeto con los datos del producto
+                            const nuevoProducto = {
+                                nombre: nombre,
+                                categoria: categoria,
+                                cantidad: cantidad,
+                                ubicacion: ubicacion,
+                                ingreso: ingreso,
+                                vencimiento: vencimiento
+                            };
+
+                            // Enviar los datos al backend
+                            fetch('http://localhost:3000/api/productos', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(nuevoProducto)
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    alert(data.message); // Muestra un mensaje de éxito
+                                    // Limpiar el formulario
+                                    formAgregarProducto.reset();
+                                    // Ocultar el modal
+                                    document.getElementById('modal').classList.add('hidden');
+                                    // Recargar la tabla de productos
+                                    cargarProductos();
+                                })
+                                .catch(error => {
+                                    console.error('Error al agregar el producto:', error);
+                                    alert('Error al agregar el producto');
+                                });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar el formulario:', error);
+                        alert('Error al cargar el formulario');
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
