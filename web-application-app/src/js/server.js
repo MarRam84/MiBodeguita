@@ -1,65 +1,63 @@
-// filepath: backend/server.js
-const express = require('express');
-const mssql = require('mssql');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+function activarInventario() {
+  const btnAgregar = document.getElementById('btnAgregar');
+  if (!btnAgregar) return;
 
-const app = express();
-const port = 3000;
+  btnAgregar.addEventListener('click', () => {
+    fetch('agregar-producto.html')
+      .then(response => response.text())
+      .then(data => {
+        showModal('Agregar Producto', data);
 
-app.use(cors());
-app.use(bodyParser.json());
+        // Esperar a que el formulario se cargue en el DOM
+        setTimeout(() => {
+          const form = document.getElementById('formAgregarProducto');
+          if (!form) {
+            console.error('Formulario no encontrado');
+            return;
+          }
 
-// Configuración de la base de datos SQL Server
-const dbConfig = {
-  server: 'localhost\\DESKTOP-8DE8JQT',
-  database: 'BodegaDB',
-  options: {
-    trustedConnection: true // Usa la autenticación de Windows
-  }
-};
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-// Función para conectar a la base de datos
-async function connectToDatabase() {
-  try {
-    await mssql.connect(dbConfig);
-    console.log('Conectado a la base de datos SQL Server');
-    return true; // Indica que la conexión fue exitosa
-  } catch (err) {
-    console.error('Error al conectar a la base de datos:', err);
-    return false; // Indica que la conexión falló
-  }
+            const nuevoProducto = {
+              nombre: document.getElementById('nombre').value,
+              categoria: document.getElementById('categoria').value,
+              cantidad: parseInt(document.getElementById('cantidad').value),
+              unidad: document.getElementById('unidad').value,
+              lote: document.getElementById('lote').value,
+              ubicacion: document.getElementById('ubicacion').value,
+              ingreso: document.getElementById('ingreso').value,
+              vencimiento: document.getElementById('vencimiento').value,
+              activo: true // o 1 si tu backend espera un BIT
+            };
+
+            // Validación básica
+            if (!nuevoProducto.nombre || isNaN(nuevoProducto.cantidad)) {
+              alert('Por favor completa los campos correctamente.');
+              return;
+            }
+
+            fetch('http://localhost:3000/api/productos', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(nuevoProducto)
+            })
+              .then(res => res.json())
+              .then(res => {
+                alert(res.message || 'Producto agregado correctamente');
+                document.getElementById('modal').classList.add('hidden');
+                loadContent('inventario.html', 'inventario'); // Recargar inventario
+              })
+              .catch(err => {
+                console.error('Error al agregar producto:', err);
+                alert('Error al agregar el producto');
+              });
+          });
+        }, 100);
+      })
+      .catch(error => {
+        console.error('Error al cargar el formulario:', error);
+        showModal('Error', '<p>No se pudo cargar el formulario.</p>');
+      });
+  });
 }
-
-// Verificar la conexión al iniciar el servidor
-connectToDatabase().then(isConnected => {
-  if (isConnected) {
-    // Rutas de la API
-    app.get('/api/productos', async (req, res) => {
-      try {
-        const result = await mssql.query`SELECT * FROM productos`;
-        res.json(result.recordset);
-      } catch (err) {
-        console.error('Error al obtener los productos:', err);
-        res.status(500).send('Error al obtener los productos');
-      }
-    });
-
-    app.post('/api/productos', async (req, res) => {
-      const producto = req.body;
-      try {
-        await mssql.query`INSERT INTO productos (nombre, categoria, cantidad, ubicacion, ingreso, vencimiento) VALUES (${producto.nombre}, ${producto.categoria}, ${producto.cantidad}, ${producto.ubicacion}, ${producto.ingreso}, ${producto.vencimiento})`;
-        res.json({ message: 'Producto agregado correctamente' });
-      } catch (err) {
-        console.error('Error al agregar el producto:', err);
-        res.status(500).send('Error al agregar el producto');
-      }
-    });
-
-    app.listen(port, () => {
-      console.log(`Servidor backend escuchando en el puerto ${port}`);
-    });
-  } else {
-    console.log('No se pudo conectar a la base de datos. El servidor no se iniciará.');
-  }
-});
