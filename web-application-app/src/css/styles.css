@@ -1,4 +1,3 @@
-/* styles.css */
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -6,10 +5,9 @@ body {
   color: #333;
 }
 
-/* Color de selección */
 ::selection {
-  background-color: #a7d9ed; /* Un tono más claro del azul del sidebar */
-  color: #fff; /* Texto blanco para mejor contraste */
+  background-color: #a7d9ed;
+  color: #fff;
 }
 
 .app-container {
@@ -106,7 +104,6 @@ th, td {
   text-align: left;
 }
 
-/* Modal styles */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -116,9 +113,11 @@ th, td {
   justify-content: center;
   z-index: 1000;
 }
+
 .modal.hidden {
   display: none;
 }
+
 .modal-content {
   background: #3df5fc;
   padding: 2rem;
@@ -127,6 +126,7 @@ th, td {
   max-width: 90vw;
   position: relative;
 }
+
 .modal-close {
   position: absolute;
   top: 10px; right: 15px;
@@ -134,34 +134,28 @@ th, td {
   cursor: pointer;
 }
 
-/* Additional styles for new sections */
-/* Removed empty .entrada rule set */
-
-/* Removed empty .salida rule set */
-
-/* Form styles */
 .form-container {
-    width: 80%;
-    margin: 20px auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 20px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .form-container h2 {
-    text-align: center;
-    color: #007bff;
+  text-align: center;
+  color: #007bff;
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
 }
 
 .form-group input[type="text"],
@@ -171,32 +165,32 @@ th, td {
 .form-group input[type="number"],
 .form-group select,
 .form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box; /* Important: Keeps padding inside the width */
-    font-size: 14px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
 }
 
 .form-group textarea {
-    resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
 }
 
 .btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .btn-primary {
-    background-color: #007bff;
-    color: #fff;
+  background-color: #007bff;
+  color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }

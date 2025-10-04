@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById('modal');
   const modalTitle = document.getElementById('modalTitle');
@@ -6,32 +5,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalClose = document.getElementById('modalClose');
   const contentArea = document.getElementById('content-area');
 
-  // Mostrar modal con contenido dinámico
   function showModal(title, bodyHtml) {
     modalTitle.textContent = title;
     modalBody.innerHTML = bodyHtml;
     modal.classList.remove('hidden');
   }
 
-  // Cerrar modal
   modalClose.addEventListener('click', () => modal.classList.add('hidden'));
   window.addEventListener('click', (e) => {
     if (e.target === modal) modal.classList.add('hidden');
   });
 
-  // Cargar contenido en el área principal
   function loadContent(url, section) {
     fetch(url)
       .then(response => response.text())
       .then(data => {
         contentArea.innerHTML = data;
 
-        // Activar lógica específica por sección
         switch (section) {
           case 'inventario':
             activarInventario();
             break;
-          // Puedes agregar más casos si otras secciones necesitan lógica JS
         }
       })
       .catch(error => {
@@ -40,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Activar lógica para la sección de inventario
   function activarInventario() {
     const btnAgregar = document.getElementById('btnAgregar');
     if (!btnAgregar) return;
@@ -51,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
           showModal('Agregar Producto', data);
 
-          // Esperar a que el formulario se cargue en el DOM
           setTimeout(() => {
             const form = document.getElementById('formAgregarProducto');
             if (!form) return;
@@ -59,23 +51,23 @@ document.addEventListener("DOMContentLoaded", () => {
             form.addEventListener('submit', (e) => {
               e.preventDefault();
 
-              // Obtener valores del formulario
               const nuevoProducto = {
                 nombre: document.getElementById('nombre').value,
                 categoria: document.getElementById('categoria').value,
                 cantidad: parseInt(document.getElementById('cantidad').value),
+                unidad: document.getElementById('unidad').value,
+                lote: document.getElementById('lote').value,
                 ubicacion: document.getElementById('ubicacion').value,
                 ingreso: document.getElementById('ingreso').value,
-                vencimiento: document.getElementById('vencimiento').value
+                vencimiento: document.getElementById('vencimiento').value,
+                activo: true
               };
 
-              // Validación básica
               if (!nuevoProducto.nombre || isNaN(nuevoProducto.cantidad)) {
                 alert('Por favor completa los campos correctamente.');
                 return;
               }
 
-              // Enviar al backend
               fetch('http://localhost:3000/api/productos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -83,9 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
               })
                 .then(res => res.json())
                 .then(res => {
-                  alert(res.message || 'Producto agregado');
-                  modal.classList.add('hidden');
-                  loadContent('inventario.html', 'inventario'); // Recargar inventario
+                  alert(res.message || 'Producto agregado correctamente');
+                  document.getElementById('modal').classList.add('hidden');
+                  loadContent('inventario.html', 'inventario');
                 })
                 .catch(err => {
                   console.error('Error al agregar producto:', err);
@@ -101,17 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Navegación del menú lateral
   document.querySelector('aside.sidebar nav ul').addEventListener('click', (e) => {
     if (e.target.tagName === 'A') {
       e.preventDefault();
       const section = e.target.dataset.section;
 
-      // Actualizar clases activas
       document.querySelectorAll('aside.sidebar nav ul li').forEach(li => li.classList.remove('active'));
       e.target.parentNode.classList.add('active');
 
-      // Determinar URL de la sección
       const urls = {
         inventario: 'inventario.html',
         entrada: 'entrada.html',
@@ -126,6 +115,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Cargar inventario por defecto
   loadContent('inventario.html', 'inventario');
 });
