@@ -1,75 +1,131 @@
 // script.js
 document.addEventListener("DOMContentLoaded", () => {
-  // Modal logic (keep this, but it might not be needed anymore)
   const modal = document.getElementById('modal');
   const modalTitle = document.getElementById('modalTitle');
   const modalBody = document.getElementById('modalBody');
   const modalClose = document.getElementById('modalClose');
+  const contentArea = document.getElementById('content-area');
 
+  // Mostrar modal con contenido dinámico
   function showModal(title, bodyHtml) {
     modalTitle.textContent = title;
     modalBody.innerHTML = bodyHtml;
     modal.classList.remove('hidden');
   }
 
-  modalClose.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
+  // Cerrar modal
+  modalClose.addEventListener('click', () => modal.classList.add('hidden'));
   window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
-    }
+    if (e.target === modal) modal.classList.add('hidden');
   });
 
-  // Function to load content into content-area
-  function loadContent(url) {
+  // Cargar contenido en el área principal
+  function loadContent(url, section) {
     fetch(url)
       .then(response => response.text())
       .then(data => {
-        document.getElementById('content-area').innerHTML = data;
+        contentArea.innerHTML = data;
+
+        // Activar lógica específica por sección
+        switch (section) {
+          case 'inventario':
+            activarInventario();
+            break;
+          // Puedes agregar más casos si otras secciones necesitan lógica JS
+        }
       })
       .catch(error => {
-        console.error('Error loading content:', error);
-        document.getElementById('content-area').innerHTML = '<p>Error al cargar la sección.</p>';
+        console.error('Error al cargar la sección:', error);
+        contentArea.innerHTML = '<p>Error al cargar la sección.</p>';
       });
   }
 
-  // Menu lateral event listeners
+  // Activar lógica para la sección de inventario
+  function activarInventario() {
+    const btnAgregar = document.getElementById('btnAgregar');
+    if (!btnAgregar) return;
+
+    btnAgregar.addEventListener('click', () => {
+      fetch('agregar-producto.html')
+        .then(response => response.text())
+        .then(data => {
+          showModal('Agregar Producto', data);
+
+          // Esperar a que el formulario se cargue en el DOM
+          setTimeout(() => {
+            const form = document.getElementById('formAgregarProducto');
+            if (!form) return;
+
+            form.addEventListener('submit', (e) => {
+              e.preventDefault();
+
+              // Obtener valores del formulario
+              const nuevoProducto = {
+                nombre: document.getElementById('nombre').value,
+                categoria: document.getElementById('categoria').value,
+                cantidad: parseInt(document.getElementById('cantidad').value),
+                ubicacion: document.getElementById('ubicacion').value,
+                ingreso: document.getElementById('ingreso').value,
+                vencimiento: document.getElementById('vencimiento').value
+              };
+
+              // Validación básica
+              if (!nuevoProducto.nombre || isNaN(nuevoProducto.cantidad)) {
+                alert('Por favor completa los campos correctamente.');
+                return;
+              }
+
+              // Enviar al backend
+              fetch('http://localhost:3000/api/productos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevoProducto)
+              })
+                .then(res => res.json())
+                .then(res => {
+                  alert(res.message || 'Producto agregado');
+                  modal.classList.add('hidden');
+                  loadContent('inventario.html', 'inventario'); // Recargar inventario
+                })
+                .catch(err => {
+                  console.error('Error al agregar producto:', err);
+                  alert('Error al agregar el producto');
+                });
+            });
+          }, 100);
+        })
+        .catch(error => {
+          console.error('Error al cargar el formulario:', error);
+          showModal('Error', '<p>No se pudo cargar el formulario.</p>');
+        });
+    });
+  }
+
+  // Navegación del menú lateral
   document.querySelector('aside.sidebar nav ul').addEventListener('click', (e) => {
     if (e.target.tagName === 'A') {
       e.preventDefault();
       const section = e.target.dataset.section;
 
-      // Remove active class from all links
+      // Actualizar clases activas
       document.querySelectorAll('aside.sidebar nav ul li').forEach(li => li.classList.remove('active'));
-      // Add active class to the clicked link's parent li
       e.target.parentNode.classList.add('active');
 
-      let url;
-      switch (section) {
-        case 'entrada':
-          url = 'entrada.html';
-          break;
-        case 'salida':
-          url = 'salida.html';
-          break;
-        case 'reportes':
-          url = 'reportes.html';
-          break;
-        case 'usuarios':
-          url = 'usuarios.html';
-          break;
-        case 'configuracion':
-          url = 'configuracion.html';
-          break;
-        default:
-          url = 'inventario.html'; // Or your default inventory page
-      }
-      loadContent(url);
+      // Determinar URL de la sección
+      const urls = {
+        inventario: 'inventario.html',
+        entrada: 'entrada.html',
+        salida: 'salida.html',
+        reportes: 'reportes.html',
+        usuarios: 'usuarios.html',
+        configuracion: 'configuracion.html'
+      };
+
+      const url = urls[section] || 'inventario.html';
+      loadContent(url, section);
     }
   });
 
-  // Load default content on page load (e.g., inventario)
-  loadContent('inventario.html'); // Replace with your default page
+  // Cargar inventario por defecto
+  loadContent('inventario.html', 'inventario');
 });
