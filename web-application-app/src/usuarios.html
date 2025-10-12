@@ -1,52 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Usuarios</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
 
-<body>
+  <body>
     <h2>Usuarios</h2>
     <form id="formUsuarios">
-        <div class="form-group">
-            <label for="nombreUsuario">Nombre:</label>
-            <input type="text" id="nombreUsuario" name="nombreUsuario" required>
-        </div>
-        <div class="form-group">
-            <label for="emailUsuario">Email:</label>
-            <input type="email" id="emailUsuario" name="emailUsuario" required>
-        </div>
-        <div class="form-group">
-            <label for="passwordUsuario">Contraseña:</label>
-            <input type="password" id="passwordUsuario" name="passwordUsuario" required>
-        </div>
-        <div class="form-group">
-            <label for="rolUsuario">Rol:</label>
-            <select id="rolUsuario" name="rolUsuario">
-                <option value="admin">Administrador</option>
-                <option value="bodeguero">Bodeguero</option>
-                <option value="visor">Visor</option>
-            </select>
-        </div>
-        <button type="submit">Crear Usuario</button>
+      <div class="form-group">
+        <label for="nombreUsuario">Nombre:</label>
+        <input type="text" id="nombreUsuario" name="nombreUsuario" required />
+      </div>
+      <div class="form-group">
+        <label for="emailUsuario">Email:</label>
+        <input type="email" id="emailUsuario" name="emailUsuario" required />
+      </div>
+      <div class="form-group">
+        <label for="passwordUsuario">Contraseña:</label>
+        <input
+          type="password"
+          id="passwordUsuario"
+          name="passwordUsuario"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="rolUsuario">Rol:</label>
+        <select id="rolUsuario" name="rolUsuario">
+          <option value="admin">Administrador</option>
+          <option value="bodeguero">Bodeguero</option>
+          <option value="visor">Visor</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Crear Usuario</button>
     </form>
     <div id="listaUsuarios">
-        <!-- Aquí se mostrará la lista de usuarios -->
+      <!-- Aquí se mostrará la lista de usuarios -->
     </div>
     <script>
-        document.getElementById('formUsuarios').addEventListener('submit', function (event) {
-            event.preventDefault();
-            // Aquí puedes agregar la lógica para enviar los datos del formulario
-            alert('Formulario de Usuarios Enviado (simulación)');
+      document
+        .getElementById("formUsuarios")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          // Aquí puedes agregar la lógica para enviar los datos del formulario
+          alert("Formulario de Usuarios Enviado (simulación)");
         });
     </script>
-</body>
-
+  </body>
 </html>

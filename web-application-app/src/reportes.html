@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reportes</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
 
-<body>
+  <body>
     <h2>Reportes</h2>
     <form id="formReportes">
-        <div class="form-group">
-            <label for="tipoReporte">Tipo de Reporte:</label>
-            <select id="tipoReporte" name="tipoReporte">
-                <option value="inventario">Inventario Actual</option>
-                <option value="entradas">Entradas por Fecha</option>
-                <option value="salidas">Salidas por Fecha</option>
-                <option value="vencimientos">Productos Próximos a Vencer</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="fechaInicioReporte">Fecha de Inicio:</label>
-            <input type="date" id="fechaInicioReporte" name="fechaInicioReporte">
-        </div>
-        <div class="form-group">
-            <label for="fechaFinReporte">Fecha de Fin:</label>
-            <input type="date" id="fechaFinReporte" name="fechaFinReporte">
-        </div>
-        <button type="submit">Generar Reporte</button>
+      <div class="form-group">
+        <label for="tipoReporte">Tipo de Reporte:</label>
+        <select id="tipoReporte" name="tipoReporte">
+          <option value="inventario">Inventario Actual</option>
+          <option value="entradas">Entradas por Fecha</option>
+          <option value="salidas">Salidas por Fecha</option>
+          <option value="vencimientos">Productos Próximos a Vencer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fechaInicioReporte">Fecha de Inicio:</label>
+        <input type="date" id="fechaInicioReporte" name="fechaInicioReporte" />
+      </div>
+      <div class="form-group">
+        <label for="fechaFinReporte">Fecha de Fin:</label>
+        <input type="date" id="fechaFinReporte" name="fechaFinReporte" />
+      </div>
+      <button type="submit" class="btn btn-primary">Generar Reporte</button>
     </form>
     <div id="reporteContainer">
-        <!-- Aquí se mostrará el reporte generado -->
+      <!-- Aquí se mostrará el reporte generado -->
     </div>
     <script>
-        document.getElementById('formReportes').addEventListener('submit', function (event) {
-            event.preventDefault();
-            // Aquí puedes agregar la lógica para enviar los datos del formulario
-            alert('Formulario de Reportes Enviado (simulación)');
+      document
+        .getElementById("formReportes")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          // Aquí puedes agregar la lógica para enviar los datos del formulario
+          alert("Formulario de Reportes Enviado (simulación)");
         });
     </script>
-</body>
-
+  </body>
 </html>
