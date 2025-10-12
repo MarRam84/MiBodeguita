@@ -121,3 +121,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadContent("inventario.html", "inventario");
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggle = document.getElementById("themeToggle");
+
+  // Activar tema guardado
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+  }
+
+  // Cambiar tema al hacer clic
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+});
