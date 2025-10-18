@@ -14,7 +14,7 @@
 
 body.dark {
   --bg-color: #1e1e1e;
-  --text-color: #050505;
+  --text-color: #ffffff;
   --sidebar-bg: #2c3e50;
   --sidebar-active: #3498db;
   --card-bg: #2c2c2c;
@@ -159,7 +159,7 @@ body {
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 15px;
-  border-radius: ;
+  border-radius: 8px;
 }
 
 .table-actions button {
@@ -182,7 +182,7 @@ body {
   overflow-x: auto;
   background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
 }
 
@@ -193,13 +193,10 @@ table {
   background-color: var(--card-bg);
 }
 
-thead {
-  background-color: #f0f8ff;
-}
-
-th, td {
+th,
+td {
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 18px;
   text-align: left;
   border-bottom: 1px solid #ccc;
   color: var(--text-color);
@@ -236,7 +233,10 @@ td:last-child button:hover {
 /* === Modal === */
 .modal {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -301,7 +301,7 @@ td:last-child button:hover {
   width: 100%;
   padding: 6px 8px;
   font-size: 13px;
-  border: 1px solid #ddd;
+  border: 1px solid #000000;
   border-radius: 4px;
   background-color: var(--input-bg);
   color: var(--text-color);
@@ -332,8 +332,14 @@ td:last-child button:hover {
 
 /* === Animaciones === */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* === Responsive === */
@@ -367,4 +373,6 @@ td:last-child button:hover {
 
   .table-actions button {
     width: 100%;
-    max-width: 200px
+    max-width: 200px;
+  }
+}
