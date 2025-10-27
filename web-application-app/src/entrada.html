@@ -23,12 +23,14 @@
     <form id="formEntrada">
       <div class="form-group">
         <label for="nombreProductoEntrada">Nombre del Producto:</label>
-        <input
-          type="text"
+        <select
           id="nombreProductoEntrada"
           name="nombreProductoEntrada"
           required
-        />
+        >
+          <option value="">Seleccione un producto</option>
+          <!-- Opciones de productos se cargarán aquí -->
+        </select>
       </div>
       <div class="form-group">
         <label for="categoriaProductoEntrada">Categoría:</label>
@@ -78,12 +80,63 @@
       <button type="submit" class="btn btn-primary">Guardar Entrada</button>
     </form>
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const selectProducto = document.getElementById("nombreProductoEntrada");
+
+        fetch("/api/productos")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("No se pudieron cargar los productos.");
+            }
+            return response.json();
+          })
+          .then((productos) => {
+            productos.forEach((producto) => {
+              const option = document.createElement("option");
+              option.value = producto.id; // O el identificador único del producto
+              option.textContent = producto.nombre;
+              selectProducto.appendChild(option);
+            });
+          })
+          .catch((error) => {
+            console.error("Error al cargar productos:", error);
+            alert("Error al cargar la lista de productos.");
+          });
+      });
+    </script>
+    <script>
       document
         .getElementById("formEntrada")
         .addEventListener("submit", function (event) {
           event.preventDefault();
-          // Aquí puedes agregar la lógica para enviar los datos del formulario
-          alert("Formulario de Entrada Enviado (simulación)");
+
+          const formData = new FormData(event.target);
+          const data = Object.fromEntries(formData.entries());
+
+          fetch("/api/entradas", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+              }
+              return response.json();
+            })
+            .then((result) => {
+              console.log("Success:", result);
+              alert("Entrada de producto guardada exitosamente.");
+              event.target.reset(); // Limpiar el formulario
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert(
+                "Hubo un error al guardar la entrada del producto. Por favor, intente de nuevo."
+              );
+            });
         });
     </script>
   </body>

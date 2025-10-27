@@ -1,97 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agregar Producto</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
 
-<body>
+  <body>
     <div class="form-container">
-        <h2>Agregar Producto</h2>
-        <form id="formAgregarProducto">
-            <div class="form-group">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required>
-            </div>
-            <div class="form-group">
-                <label for="categoria">Categoría:</label>
-                <select id="categoria" name="categoria" required>
-                    <option value="">Seleccionar Categoría</option>
-                    <option value="alimentos">Alimentos</option>
-                    <option value="bebidas">Bebidas</option>
-                    <option value="limpieza">Limpieza</option>
-                    <option value="otros">Otros</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="cantidad">Cantidad:</label>
-                <input type="number" id="cantidad" name="cantidad" required>
-            </div>
-            <div class="form-group">
-                <label for="ubicacion">Ubicación:</label>
-                <input type="text" id="ubicacion" name="ubicacion">
-            </div>
-            <div class="form-group">
-                <label for="ingreso">Fecha de Ingreso:</label>
-                <input type="date" id="ingreso" name="ingreso" required>
-            </div>
-            <div class="form-group">
-                <label for="vencimiento">Fecha de Vencimiento:</label>
-                <input type="date" id="vencimiento" name="vencimiento">
-            </div>
-            <button type="submit" class="btn btn-primary">Agregar Producto</button>
-        </form>
+      <h2>Agregar Producto</h2>
+      <form id="formAgregarProducto">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="categoria">Categoría:</label>
+          <select id="categoria" name="categoria" required>
+            <option value="">Seleccionar Categoría</option>
+            <option value="alimentos">Alimentos</option>
+            <option value="bebidas">Bebidas</option>
+            <option value="limpieza">Limpieza</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cantidad">Cantidad:</label>
+          <input type="number" id="cantidad" name="cantidad" required />
+        </div>
+        <div class="form-group">
+          <label for="ubicacion">Ubicación:</label>
+          <input type="text" id="ubicacion" name="ubicacion" />
+        </div>
+        <div class="form-group">
+          <label for="ingreso">Fecha de Ingreso:</label>
+          <input type="date" id="ingreso" name="ingreso" required />
+        </div>
+        <div class="form-group">
+          <label for="vencimiento">Fecha de Vencimiento:</label>
+          <input type="date" id="vencimiento" name="vencimiento" />
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Producto</button>
+      </form>
     </div>
-
-    <script>
-        document.getElementById('formAgregarProducto').addEventListener('submit', function (event) {
-            event.preventDefault(); // Evita que el formulario se envíe de la manera tradicional
-
-            // Obtener los valores del formulario
-            const nombre = document.getElementById('nombre').value;
-            const categoria = document.getElementById('categoria').value;
-            const cantidad = document.getElementById('cantidad').value;
-            const ubicacion = document.getElementById('ubicacion').value;
-            const ingreso = document.getElementById('ingreso').value;
-            const vencimiento = document.getElementById('vencimiento').value;
-
-            // Crear un objeto con los datos del producto
-            const nuevoProducto = {
-                nombre: nombre,
-                categoria: categoria,
-                cantidad: cantidad,
-                ubicacion: ubicacion,
-                ingreso: ingreso,
-                vencimiento: vencimiento
-            };
-
-            // Enviar los datos al backend
-            fetch('http://localhost:3000/api/productos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(nuevoProducto)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message); // Muestra un mensaje de éxito
-                    // Limpiar el formulario o redirigir a otra página
-                    document.getElementById('formAgregarProducto').reset();
-                })
-                .catch(error => {
-                    console.error('Error al agregar el producto:', error);
-                    alert('Error al agregar el producto');
-                });
-        });
-    </script>
-</body>
-
+  </body>
 </html>
