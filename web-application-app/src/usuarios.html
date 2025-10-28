@@ -66,36 +66,5 @@
         </table>
       </div>
     </section>
-    <script>
-      document
-        .getElementById("formUsuarios")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          const formData = {
-            nombre: document.getElementById("nombre").value,
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-            Rol: document.getElementById("rol").value,
-          };
-
-          try {
-            const response = await fetch("/api/usuarios", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(formData),
-            });
-
-            const result = await response.json();
-            console.log(result);
-            alert("Usuario creado correctamente");
-          } catch (error) {
-            console.error("Error al enviar el formulario:", error);
-            alert("Hubo un error al crear el usuario");
-          }
-        });
-    </script>
   </body>
 </html>

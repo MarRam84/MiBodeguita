@@ -68,6 +68,74 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
+app.get("/api/usuarios/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query(
+    "SELECT UsuarioID, nombre, email, Rol FROM usuarios WHERE UsuarioID = ?",
+    [id],
+    (err, results) => {
+      if (err) {
+        console.error("Error querying usuario:", err);
+        res.status(500).json({ error: "Error al obtener el usuario" });
+        return;
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      res.json(results[0]);
+    }
+  );
+});
+
+app.put("/api/usuarios/:id", async (req, res) => {
+  const { id } = req.params;
+  const userData = req.body;
+
+  // If a new password is provided, hash it.
+  if (userData.password) {
+    try {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    } catch (error) {
+      return res.status(500).json({ error: "Error al encriptar la contraseña" });
+    }
+  }
+
+  pool.query(
+    "UPDATE usuarios SET ? WHERE UsuarioID = ?",
+    [userData, id],
+    (err, results) => {
+      if (err) {
+        console.error("Error updating usuario:", err);
+        res.status(500).json({ error: "Error al actualizar el usuario" });
+        return;
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      res.json({ message: "Usuario actualizado correctamente" });
+    }
+  );
+});
+
+app.delete("/api/usuarios/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query(
+    "DELETE FROM usuarios WHERE UsuarioID = ?",
+    [id],
+    (err, results) => {
+      if (err) {
+        console.error("Error deleting usuario:", err);
+        res.status(500).json({ error: "Error al eliminar el usuario" });
+        return;
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      res.json({ message: "Usuario eliminado correctamente" });
+    }
+  );
+});
+
 // API routes for productos
 app.get("/api/productos", (req, res) => {
   pool.query("SELECT * FROM productos", (err, results) => {
@@ -173,6 +241,21 @@ app.post("/api/entradas", (req, res) => {
       if (results.affectedRows === 0) {
         return res.status(404).json({ error: "Producto no encontrado." });
       }
+
+      // Log the movement
+      const movimiento = {
+        ProductoID: nombreProductoEntrada,
+        Tipo: 'Entrada',
+        Cantidad: cantidad
+      };
+      pool.query("INSERT INTO movimientos SET ?", movimiento, (err, results) => {
+        if (err) {
+          // If logging fails, just log the error to the console but don't send a response
+          // as the main operation was successful.
+          console.error("Error logging movement:", err);
+        }
+      });
+
       res.json({ message: "Entrada de stock registrada correctamente." });
     }
   );
@@ -222,11 +305,42 @@ app.post("/api/salidas", (req, res) => {
             // This case should ideally not be reached due to the check above
             return res.status(404).json({ error: "Producto no encontrado." });
           }
+
+          // Log the movement
+          const movimiento = {
+            ProductoID: nombreProductoSalida,
+            Tipo: 'Salida',
+            Cantidad: cantidad
+          };
+          pool.query("INSERT INTO movimientos SET ?", movimiento, (err, results) => {
+            if (err) {
+              console.error("Error logging movement:", err);
+            }
+          });
+
           res.json({ message: "Salida de stock registrada correctamente." });
         }
       );
     }
   );
+});
+
+app.get("/api/movimientos", (req, res) => {
+  const query = `
+    SELECT m.Tipo, m.Cantidad, m.Fecha, p.nombre AS ProductoNombre
+    FROM movimientos m
+    JOIN productos p ON m.ProductoID = p.ProductoID
+    ORDER BY m.Fecha DESC
+    LIMIT 5;
+  `;
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error("Error querying movimientos:", err);
+      res.status(500).json({ error: "Error al obtener los movimientos" });
+      return;
+    }
+    res.json(results);
+  });
 });
 
 // Handle Chrome DevTools request
