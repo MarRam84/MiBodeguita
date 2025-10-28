@@ -26,26 +26,29 @@ const pool = mysql.createPool({
 
 // API routes for usuarios
 app.get("/api/usuarios", (req, res) => {
-  pool.query("SELECT nombre, email, Rol FROM usuarios", (err, results) => {
-    if (err) {
-      console.error("Error querying usuarios:", err);
-      res.status(500).json({ error: "Error al obtener los usuarios" });
-      return;
+  pool.query(
+    "SELECT UsuarioID, nombre, email, Rol FROM usuarios",
+    (err, results) => {
+      if (err) {
+        console.error("Error querying usuarios:", err);
+        res.status(500).json({ error: "Error al obtener los usuarios" });
+        return;
+      }
+      res.json(results);
     }
-    res.json(results);
-  });
+  );
 });
 
 app.post("/api/usuarios", async (req, res) => {
-  const { nombre, email, rol, password } = req.body;
+  const { nombre, email, Rol, password } = req.body;
 
-  if (!nombre || !email || !rol || !password) {
+  if (!nombre || !email || !Rol || !password) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { nombre, email, rol, password: hashedPassword };
+    const newUser = { nombre, email, Rol, password: hashedPassword };
 
     pool.query("INSERT INTO usuarios SET ?", newUser, (err, results) => {
       if (err) {
@@ -63,49 +66,6 @@ app.post("/api/usuarios", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
-});
-
-app.post("/api/login", (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Email y contraseña son obligatorios" });
-  }
-
-  pool.query(
-    "SELECT * FROM usuarios WHERE email = ?",
-    [email],
-    async (err, results) => {
-      if (err) {
-        console.error("Error querying usuario:", err);
-        return res.status(500).json({ error: "Error interno del servidor" });
-      }
-
-      if (results.length === 0) {
-        return res.status(401).json({ error: "Credenciales inválidas" });
-      }
-
-      const user = results[0];
-      const passwordMatch = await bcrypt.compare(password, user.password);
-
-      if (!passwordMatch) {
-        return res.status(401).json({ error: "Credenciales inválidas" });
-      }
-
-      // En una aplicación real, aquí se generaría un token (JWT)
-      res.json({
-        message: "Login exitoso",
-        user: {
-          id: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          rol: user.rol,
-        },
-      });
-    }
-  );
 });
 
 // API routes for productos
