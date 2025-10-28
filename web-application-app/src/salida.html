@@ -23,12 +23,10 @@
     <form id="formSalida">
       <div class="form-group">
         <label for="nombreProductoSalida">Nombre del Producto:</label>
-        <input
-          type="text"
-          id="nombreProductoSalida"
-          name="nombreProductoSalida"
-          required
-        />
+        <select id="nombreProductoSalida" name="nombreProductoSalida" required>
+          <option value="">Seleccione un producto</option>
+          <!-- Opciones de productos se cargarán aquí -->
+        </select>
       </div>
       <div class="form-group">
         <label for="cantidadProductoSalida">Cantidad a Retirar:</label>
@@ -58,14 +56,5 @@
       </div>
       <button type="submit" class="btn btn-primary">Registrar Salida</button>
     </form>
-    <script>
-      document
-        .getElementById("formSalida")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          // Aquí puedes agregar la lógica para enviar los datos del formulario
-          alert("Formulario de Salida Enviado (simulación)");
-        });
-    </script>
   </body>
 </html>

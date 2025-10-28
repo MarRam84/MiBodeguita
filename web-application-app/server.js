@@ -82,7 +82,7 @@ app.get("/api/productos", (req, res) => {
 
 app.get("/api/productos/:id", (req, res) => {
   const { id } = req.params;
-  pool.query("SELECT * FROM productos WHERE id = ?", [id], (err, results) => {
+  pool.query("SELECT * FROM productos WHERE ProductoID = ?", [id], (err, results) => {
     if (err) {
       console.error("Error querying producto:", err);
       res.status(500).json({ error: "Error al obtener el producto" });
@@ -114,7 +114,7 @@ app.put("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   const updatedProducto = req.body;
   pool.query(
-    "UPDATE productos SET ? WHERE id = ?",
+    "UPDATE productos SET ? WHERE ProductoID =  ?",
     [updatedProducto, id],
     (err, results) => {
       if (err) {
@@ -132,17 +132,101 @@ app.put("/api/productos/:id", (req, res) => {
 
 app.delete("/api/productos/:id", (req, res) => {
   const { id } = req.params;
-  pool.query("DELETE FROM productos WHERE id = ?", [id], (err, results) => {
-    if (err) {
-      console.error("Error deleting producto:", err);
-      res.status(500).json({ error: "Error al eliminar el producto" });
-      return;
+  pool.query(
+    "DELETE FROM productos WHERE ProductoID = ?",
+    [id],
+    (err, results) => {
+      if (err) {
+        console.error("Error deleting producto:", err);
+        res.status(500).json({ error: "Error al eliminar el producto" });
+        return;
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      res.json({ message: "Producto eliminado correctamente" });
     }
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ error: "Producto no encontrado" });
+  );
+});
+
+app.post("/api/entradas", (req, res) => {
+  const { nombreProductoEntrada, cantidadProductoEntrada } = req.body;
+
+  if (!nombreProductoEntrada || !cantidadProductoEntrada) {
+    return res.status(400).json({ error: "Se requiere el producto y la cantidad." });
+  }
+
+  const cantidad = parseInt(cantidadProductoEntrada, 10);
+  if (isNaN(cantidad) || cantidad <= 0) {
+    return res.status(400).json({ error: "La cantidad debe ser un número positivo." });
+  }
+
+  pool.query(
+    "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
+    [cantidad, nombreProductoEntrada],
+    (err, results) => {
+      if (err) {
+        console.error("Error updating stock:", err);
+        res.status(500).json({ error: "Error al actualizar el stock del producto." });
+        return;
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Producto no encontrado." });
+      }
+      res.json({ message: "Entrada de stock registrada correctamente." });
     }
-    res.json({ message: "Producto eliminado correctamente" });
-  });
+  );
+});
+
+app.post("/api/salidas", (req, res) => {
+  const { nombreProductoSalida, cantidadProductoSalida } = req.body;
+
+  if (!nombreProductoSalida || !cantidadProductoSalida) {
+    return res.status(400).json({ error: "Se requiere el producto y la cantidad." });
+  }
+
+  const cantidad = parseInt(cantidadProductoSalida, 10);
+  if (isNaN(cantidad) || cantidad <= 0) {
+    return res.status(400).json({ error: "La cantidad debe ser un número positivo." });
+  }
+
+  // Check for sufficient stock before updating
+  pool.query(
+    "SELECT cantidad FROM productos WHERE ProductoID = ?",
+    [nombreProductoSalida],
+    (err, results) => {
+      if (err) {
+        console.error("Error checking stock:", err);
+        return res.status(500).json({ error: "Error al verificar el stock." });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Producto no encontrado." });
+      }
+
+      const stockActual = results[0].cantidad;
+      if (stockActual < cantidad) {
+        return res.status(400).json({ error: `Stock insuficiente. Solo quedan ${stockActual} unidades.` });
+      }
+
+      // Proceed with the update
+      pool.query(
+        "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
+        [cantidad, nombreProductoSalida],
+        (updateErr, updateResults) => {
+          if (updateErr) {
+            console.error("Error updating stock:", updateErr);
+            return res.status(500).json({ error: "Error al actualizar el stock del producto." });
+          }
+          if (updateResults.affectedRows === 0) {
+            // This case should ideally not be reached due to the check above
+            return res.status(404).json({ error: "Producto no encontrado." });
+          }
+          res.json({ message: "Salida de stock registrada correctamente." });
+        }
+      );
+    }
+  );
 });
 
 // Handle Chrome DevTools request

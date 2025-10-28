@@ -47,12 +47,112 @@ document.addEventListener("DOMContentLoaded", () => {
           case "usuarios":
             activarUsuarios();
             break;
+          case "entrada":
+            activarEntrada();
+            break;
+          case "salida":
+            activarSalida();
+            break;
         }
       })
       .catch((error) => {
         console.error("Error al cargar la sección:", error);
         contentArea.innerHTML = "<p>Error al cargar la sección.</p>";
       });
+  }
+
+  // --- ENTRADA LOGIC --- //
+  function activarEntrada() {
+    const formEntrada = document.getElementById("formEntrada");
+    const selectProducto = document.getElementById("nombreProductoEntrada");
+
+    // Populate product dropdown
+    fetch(`${API_BASE_URL}/productos`)
+      .then(response => response.json())
+      .then(productos => {
+        productos.forEach(producto => {
+          const option = document.createElement("option");
+          option.value = producto.ProductoID;
+          option.textContent = producto.nombre;
+          selectProducto.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error("Error al cargar productos:", error);
+        alert("Error al cargar la lista de productos.");
+      });
+
+    // Handle form submission
+    formEntrada.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData.entries());
+
+      fetch(`${API_BASE_URL}/entradas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json().then(body => ({ ok: response.ok, body })))
+      .then(({ ok, body }) => {
+        if (!ok) {
+          throw new Error(body.error || "Error en la respuesta del servidor");
+        }
+        alert(body.message);
+        event.target.reset();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert(`Hubo un error al guardar la entrada: ${error.message}`);
+      });
+    });
+  }
+
+  // --- SALIDA LOGIC --- //
+  function activarSalida() {
+    const formSalida = document.getElementById("formSalida");
+    const selectProducto = document.getElementById("nombreProductoSalida");
+
+    // Populate product dropdown
+    fetch(`${API_BASE_URL}/productos`)
+      .then(response => response.json())
+      .then(productos => {
+        productos.forEach(producto => {
+          const option = document.createElement("option");
+          option.value = producto.ProductoID;
+          option.textContent = producto.nombre;
+          selectProducto.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error("Error al cargar productos:", error);
+        alert("Error al cargar la lista de productos.");
+      });
+
+    // Handle form submission
+    formSalida.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData.entries());
+
+      fetch(`${API_BASE_URL}/salidas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json().then(body => ({ ok: response.ok, body })))
+      .then(({ ok, body }) => {
+        if (!ok) {
+          throw new Error(body.error || "Error en la respuesta del servidor");
+        }
+        alert(body.message);
+        event.target.reset();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert(`Hubo un error al registrar la salida: ${error.message}`);
+      });
+    });
   }
 
   // --- USER LOGIC --- //
@@ -80,9 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         usuarios.forEach(usuario => {
             const fila = document.createElement("tr");
-            fila.dataset.id = usuario.id;
+            fila.dataset.id = usuario.UsuarioID;
             fila.innerHTML = `
-                <td>${usuario.id}</td>
+                <td>${usuario.UsuarioID}</td>
                 <td>${usuario.nombre}</td>
                 <td>${usuario.email}</td>
                 <td>${usuario.rol}</td>
@@ -166,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       productos.forEach((producto) => {
         const fila = document.createElement("tr");
-        fila.dataset.id = producto.id;
+        fila.dataset.id = producto.ProductoID;
         fila.innerHTML = `
           <td>${producto.nombre}</td>
           <td>${producto.categoria}</td>
