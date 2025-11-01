@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalTitle = document.getElementById("modalTitle");
   const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
+  const modalContent = document.querySelector(".modal-content");
   const contentArea = document.getElementById("content-area");
   const themeToggle = document.getElementById("themeToggle");
 
@@ -23,8 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modalTitle.textContent = title;
     modalBody.innerHTML = bodyHtml;
     modal.classList.remove("hidden");
+    modalContent.classList.add("start-animation");
   }
   function hideModal() {
+    modalContent.classList.remove("start-animation");
     modal.classList.add("hidden");
   }
   modalClose.addEventListener("click", hideModal);

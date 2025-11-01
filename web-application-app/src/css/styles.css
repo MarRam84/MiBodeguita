@@ -242,10 +242,14 @@ td:last-child button:hover {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal.hidden {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .modal-content {
@@ -255,8 +259,11 @@ td:last-child button:hover {
   min-width: 300px;
   max-width: 90vw;
   position: relative;
-  animation: fadeIn 0.3s ease;
   color: var(--text-color);
+}
+
+.modal-content.start-animation {
+  animation: fadeIn 0.3s ease;
 }
 
 .modal-close {
