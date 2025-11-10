@@ -383,3 +383,31 @@ td:last-child button:hover {
     max-width: 200px;
   }
 }
+
+#reporteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+#reporteHeader h3 {
+  margin: 0;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+}

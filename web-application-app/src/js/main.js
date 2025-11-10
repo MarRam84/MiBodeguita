@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE_URL = "http://localhost:3000/api";
+
   const modal = document.getElementById("modal");
   const modalTitle = document.getElementById("modalTitle");
   const modalBody = document.getElementById("modalBody");
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fecha = new Date(fechaString);
     const userTimezoneOffset = fecha.getTimezoneOffset() * 60000;
     const adjustedDate = new Date(fecha.getTime() + userTimezoneOffset);
-    
+
     const options = {
       day: "2-digit",
       month: "2-digit",
@@ -49,8 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (includeTime) {
-      options.hour = '2-digit';
-      options.minute = '2-digit';
+      options.hour = "2-digit";
+      options.minute = "2-digit";
     }
 
     return adjustedDate.toLocaleString("es-ES", options);
@@ -75,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const DIAS_PARA_VENCER_UMBRAL = 30;
       const hoy = new Date();
 
-      const stockCritico = productos.filter((p) => p.cantidad < STOCK_CRITICO_UMBRAL).length;
+      const stockCritico = productos.filter(
+        (p) => p.cantidad < STOCK_CRITICO_UMBRAL
+      ).length;
       const proximosAVencer = productos.filter((p) => {
         if (!p.vencimiento) return false;
         const fechaVencimiento = new Date(p.vencimiento);
@@ -87,37 +90,49 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("totalProductos").textContent = productos.length;
       document.getElementById("stockCritico").textContent = stockCritico;
       document.getElementById("proximosAVencer").textContent = proximosAVencer;
-      
+
       // Update movimientos
       const contenedor = document.getElementById("ultimosMovimientos");
       if (!movimientos || movimientos.length === 0) {
         contenedor.innerHTML = "<p>No hay movimientos recientes.</p>";
         return;
       }
-      
+
       const lista = document.createElement("ul");
       lista.className = "movimientos-lista";
 
-      movimientos.forEach(mov => {
-          const item = document.createElement("li");
-          const tipoClase = mov.Tipo === 'Entrada' ? 'entrada' : 'salida';
-          item.innerHTML = `
+      movimientos.forEach((mov) => {
+        const item = document.createElement("li");
+        const tipoClase = mov.Tipo === "Entrada" ? "entrada" : "salida";
+        item.innerHTML = `
               <span class="movimiento-tipo ${tipoClase}">${mov.Tipo}</span>
               <span class="movimiento-cantidad">${mov.Cantidad} x</span>
               <span class="movimiento-nombre">${mov.ProductoNombre}</span>
-              <span class="movimiento-fecha">${formatearFecha(mov.Fecha, true)}</span>
+              <span class="movimiento-fecha">${formatearFecha(
+                mov.Fecha,
+                true
+              )}</span>
           `;
-          lista.appendChild(item);
+        lista.appendChild(item);
       });
       contenedor.innerHTML = "";
       contenedor.appendChild(lista);
-
     } catch (error) {
       console.error("Error actualizando dashboard:", error);
     }
   }
 
   // --- DYNAMIC CONTENT LOADING --- //
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
   function loadContent(url, section) {
     fetch(url)
       .then((response) => response.text())
@@ -139,12 +154,313 @@ document.addEventListener("DOMContentLoaded", () => {
           case "salida":
             activarSalida();
             break;
+          case "reportes":
+            loadScript("https://cdn.jsdelivr.net/npm/chart.js")
+              .then(() => {
+                activarReportes();
+              })
+              .catch((error) => {
+                console.error("Error loading Chart.js", error);
+                contentArea.innerHTML =
+                  "<p>Error al cargar la librería de gráficos.</p>";
+              });
+            break;
         }
       })
       .catch((error) => {
         console.error("Error al cargar la sección:", error);
-        contentArea.innerHTML = '<p>Error al cargar la sección.</p>';
+        contentArea.innerHTML = "<p>Error al cargar la sección.</p>";
       });
+  }
+
+  // --- REPORTES LOGIC --- //
+  function activarReportes() {
+    const formReportes = document.getElementById("formReportes");
+    const reporteContainer = document.getElementById("reporteContainer");
+    const reporteHeader = document.getElementById("reporteHeader");
+    const reporteTitulo = document.getElementById("reporteTitulo");
+    const btnImprimir = document.getElementById("btnImprimir");
+    const reporteContenido = document.getElementById("reporteContenido");
+    const fechaInicioInput = document.getElementById("fechaInicioReporte");
+    const fechaFinInput = document.getElementById("fechaFinReporte");
+    const tipoReporteSelect = document.getElementById("tipoReporte");
+
+    // Show/hide date fields based on report type
+    tipoReporteSelect.addEventListener("change", () => {
+      const selected = tipoReporteSelect.value;
+      if (selected === "entradas" || selected === "salidas") {
+        fechaInicioInput.parentElement.style.display = "block";
+        fechaFinInput.parentElement.style.display = "block";
+      } else {
+        fechaInicioInput.parentElement.style.display = "none";
+        fechaFinInput.parentElement.style.display = "none";
+      }
+    });
+    // Trigger change on load
+    tipoReporteSelect.dispatchEvent(new Event("change"));
+
+    btnImprimir.addEventListener("click", () => {
+      window.print();
+    });
+
+    formReportes.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const tipoReporte = tipoReporteSelect.value;
+      const fechaInicio = fechaInicioInput.value;
+      const fechaFin = fechaFinInput.value;
+
+      reporteContenido.innerHTML = "<p>Generando reporte...</p>";
+      reporteHeader.style.display = "none";
+
+      try {
+        let url = `${API_BASE_URL}/`;
+        let data;
+
+        switch (tipoReporte) {
+          case "inventario":
+            url += `productos`; // No es necesario el API_BASE_URL aquí
+            const response = await fetch(`${API_BASE_URL}${url}`);
+            if (!response.ok) throw new Error("Error al cargar el inventario.");
+            data = await response.json();
+            renderizarReporteInventario(data);
+            break;
+          case "entradas":
+          case "salidas":
+            url = `${API_BASE_URL}/movimientos?tipo=${tipoReporte.slice(
+              0,
+              -1
+            )}&inicio=${fechaInicio}&fin=${fechaFin}`;
+            const movResponse = await fetch(url);
+            if (!movResponse.ok)
+              throw new Error(`Error al cargar ${tipoReporte}.`);
+            data = await movResponse.json();
+            renderizarReporteMovimientos(data, tipoReporte);
+            break;
+          case "vencimientos":
+            url = `${API_BASE_URL}/productos/vencimiento`;
+            const vencResponse = await fetch(url);
+            if (!vencResponse.ok)
+              throw new Error("Error al cargar productos por vencer.");
+            data = await vencResponse.json();
+            renderizarReporteVencimientos(data);
+            break;
+        }
+      } catch (error) {
+        reporteContenido.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        console.error("Error al generar reporte:", error);
+      }
+    });
+
+    function generarGrafico(data, tipoReporte) {
+      const ctx = document.getElementById("reporteGrafico").getContext("2d");
+      let chartData = {};
+
+      // Destroy previous chart instance if it exists
+      if (window.myChart instanceof Chart) {
+        window.myChart.destroy();
+      }
+
+      switch (tipoReporte) {
+        case "inventario":
+          chartData = {
+            labels: data.map((p) => p.nombre),
+            datasets: [
+              {
+                label: "Cantidad en Inventario",
+                data: data.map((p) => p.cantidad),
+                backgroundColor: "rgba(54, 162, 235, 0.6)",
+                borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 1,
+              },
+            ],
+          };
+          break;
+        case "entradas":
+        case "salidas":
+          const dataAgrupada = data.reduce((acc, m) => {
+            const fecha = formatearFecha(m.Fecha);
+            acc[fecha] = (acc[fecha] || 0) + m.Cantidad;
+            return acc;
+          }, {});
+
+          chartData = {
+            labels: Object.keys(dataAgrupada),
+            datasets: [
+              {
+                label: `Cantidad de ${tipoReporte}`,
+                data: Object.values(dataAgrupada),
+                backgroundColor:
+                  tipoReporte === "entradas"
+                    ? "rgba(75, 192, 192, 0.6)"
+                    : "rgba(255, 99, 132, 0.6)",
+                borderColor:
+                  tipoReporte === "entradas"
+                    ? "rgba(75, 192, 192, 1)"
+                    : "rgba(255, 99, 132, 1)",
+                borderWidth: 1,
+              },
+            ],
+          };
+          break;
+        case "vencimientos":
+          chartData = {
+            labels: data.map((p) => p.nombre),
+            datasets: [
+              {
+                label: "Días para Vencer",
+                data: data.map((p) => {
+                  const hoy = new Date();
+                  const fechaVencimiento = new Date(p.vencimiento);
+                  const diffTiempo = fechaVencimiento.getTime() - hoy.getTime();
+                  return Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
+                }),
+                backgroundColor: "rgba(255, 159, 64, 0.6)",
+                borderColor: "rgba(255, 159, 64, 1)",
+                borderWidth: 1,
+              },
+            ],
+          };
+          break;
+      }
+
+      window.myChart = new Chart(ctx, {
+        type: "bar",
+        data: chartData,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        },
+      });
+    }
+
+    function renderizarReporteInventario(productos) {
+      reporteHeader.style.display = "flex";
+      reporteTitulo.textContent = "Reporte de Inventario Actual";
+      reporteContenido.innerHTML =
+        '<div class="chart-container"><canvas id="reporteGrafico"></canvas></div><div id="tablaReporteContenedor"></div>';
+
+      if (productos.length === 0) {
+        reporteContenido.innerHTML =
+          "<p>No hay productos en el inventario.</p>";
+        return;
+      }
+      generarGrafico(productos, "inventario");
+      const tabla = `
+            <table class="tabla-reporte">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Ubicación</th>
+                        <th>Fecha Ingreso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${productos
+                      .map(
+                        (p) => `
+                        <tr>
+                            <td>${p.nombre}</td>
+                            <td>${p.categoria}</td>
+                            <td>${p.cantidad}</td>
+                            <td>${p.ubicacion || "N/A"}</td>
+                            <td>${formatearFecha(p.ingreso)}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </tbody>
+            </table>`;
+      document.getElementById("tablaReporteContenedor").innerHTML = tabla;
+    }
+
+    function renderizarReporteMovimientos(movimientos, tipo) {
+      const titulo = `Reporte de ${
+        tipo.charAt(0).toUpperCase() + tipo.slice(1)
+      }`;
+      reporteHeader.style.display = "flex";
+      reporteTitulo.textContent = titulo;
+      reporteContenido.innerHTML =
+        '<div class="chart-container"><canvas id="reporteGrafico"></canvas></div><div id="tablaReporteContenedor"></div>';
+
+      if (movimientos.length === 0) {
+        reporteContenido.innerHTML = `<p>No hay ${tipo} en el rango de fechas seleccionado.</p>`;
+        return;
+      }
+      generarGrafico(movimientos, tipo);
+      const tabla = `
+            <table class="tabla-reporte">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${movimientos
+                      .map(
+                        (m) => `
+                        <tr>
+                            <td>${m.ProductoNombre}</td>
+                            <td>${m.Cantidad}</td>
+                            <td>${formatearFecha(m.Fecha, true)}</td>
+                            <td>${m.UsuarioNombre || "N/A"}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </tbody>
+            </table>`;
+      document.getElementById("tablaReporteContenedor").innerHTML = tabla;
+    }
+
+    function renderizarReporteVencimientos(productos) {
+      reporteHeader.style.display = "flex";
+      reporteTitulo.textContent = "Reporte de Productos Próximos a Vencer";
+      reporteContenido.innerHTML =
+        '<div class="chart-container"><canvas id="reporteGrafico"></canvas></div><div id="tablaReporteContenedor"></div>';
+
+      if (productos.length === 0) {
+        reporteContenido.innerHTML =
+          "<p>No hay productos próximos a vencer.</p>";
+        return;
+      }
+      generarGrafico(productos, "vencimientos");
+      const tabla = `
+            <table class="tabla-reporte">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Fecha de Vencimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${productos
+                      .map(
+                        (p) => `
+                        <tr>
+                            <td>${p.nombre}</td>
+                            <td>${p.categoria}</td>
+                            <td>${p.cantidad}</td>
+                            <td>${formatearFecha(p.vencimiento)}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </tbody>
+            </table>`;
+      document.getElementById("tablaReporteContenedor").innerHTML = tabla;
+    }
   }
 
   // --- ENTRADA LOGIC --- //
@@ -186,7 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           alert(body.message);
           event.target.reset();
-          actualizarDashboard(); 
+          actualizarDashboard();
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -319,7 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const [userResponse, formHtmlResponse] = await Promise.all([
           fetch(`${API_BASE_URL}/usuarios/${usuarioId}`),
-          fetch("usuarios.html"),
+          fetch("usuarios.html"), // No necesita autenticación
         ]);
 
         if (!userResponse.ok)
@@ -335,7 +651,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const formNode = doc.querySelector("#formUsuarios");
 
         if (!formNode)
-          throw new Error("No se pudo encontrar el formulario en usuarios.html");
+          throw new Error(
+            "No se pudo encontrar el formulario en usuarios.html"
+          );
 
         showModal("Editar Usuario", formNode.outerHTML);
 
@@ -351,7 +669,9 @@ document.addEventListener("DOMContentLoaded", () => {
         form.querySelector("button[type='submit']").textContent =
           "Actualizar Usuario";
 
-        form.addEventListener("submit", (e) => handleUpdateUsuario(e, usuarioId));
+        form.addEventListener("submit", (e) =>
+          handleUpdateUsuario(e, usuarioId)
+        );
       } catch (error) {
         console.error("Error en handleEditarUsuario:", error);
         alert(error.message);
@@ -509,11 +829,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const updatedProducto = Object.fromEntries(formData.entries());
 
       try {
-        const response = await fetch(`${API_BASE_URL}/productos/${productoId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedProducto),
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/productos/${productoId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedProducto),
+          }
+        );
         const result = await response.json();
         if (!response.ok)
           throw new Error(result.error || "Error en el servidor");
@@ -531,7 +854,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const [productResponse, formResponse] = await Promise.all([
           fetch(`${API_BASE_URL}/productos/${productoId}`),
-          fetch("agregar-producto.html"),
+          fetch("agregar-producto.html"), // No necesita autenticación
         ]);
 
         if (!productResponse.ok)
@@ -571,9 +894,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/productos/${productoId}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/productos/${productoId}`,
+          {
+            method: "DELETE",
+          }
+        );
         const result = await response.json();
         if (!response.ok)
           throw new Error(result.error || "Error en el servidor");

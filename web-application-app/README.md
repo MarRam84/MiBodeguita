@@ -1,6 +1,6 @@
-# Web Application
+# Mi Bodeguita - Sistema de Gestión de Inventario
 
-This project is a simple web application that demonstrates the separation of HTML, CSS, and JavaScript files.
+Este proyecto es una aplicación full-stack para la gestión de un pequeño inventario. Consiste en un backend con una API REST construido con Node.js y Express, y un frontend web.
 
 ## Project Structure
 
@@ -20,11 +20,13 @@ web-application-app
 To set up and run the web application, follow these steps:
 
 1. **Clone the repository**:
+
    ```
    git clone <repository-url>
    ```
 
 2. **Navigate to the project directory**:
+
    ```
    cd web-application-app
    ```

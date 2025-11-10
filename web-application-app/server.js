@@ -1,7 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
-const mysql = require("mysql2");
+const sqlite3 = require("sqlite3").verbose(); // Usar sqlite3
 const path = require("path");
 const bcrypt = require("bcrypt");
 
@@ -13,32 +13,68 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "src")));
 
-// Database connection pool
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+// Conexión a la base de datos SQLite
+// Se usará una base de datos basada en archivos llamada 'inventario.db'
+const db = new sqlite3.Database(
+  path.join(__dirname, "inventario.db"),
+  (err) => {
+    if (err) {
+      console.error("Error al abrir la base de datos SQLite:", err.message);
+    } else {
+      console.log("Conectado a la base de datos SQLite 'inventario.db'.");
+      // Inicializar las tablas si no existen
+      db.serialize(() => {
+        db.run(`CREATE TABLE IF NOT EXISTS usuarios (
+        UsuarioID INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        Rol TEXT NOT NULL,
+        password TEXT NOT NULL
+      )`);
 
+        db.run(`CREATE TABLE IF NOT EXISTS productos (
+        ProductoID INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        categoria TEXT,
+        cantidad INTEGER DEFAULT 0,
+        vencimiento DATE
+      )`);
+
+        db.run(`CREATE TABLE IF NOT EXISTS movimientos (
+        MovimientoID INTEGER PRIMARY KEY AUTOINCREMENT,
+        ProductoID INTEGER,
+        Tipo TEXT NOT NULL, -- 'Entrada' o 'Salida'
+        Cantidad INTEGER NOT NULL,
+        Fecha TEXT DEFAULT (datetime('now', 'localtime')),
+        FOREIGN KEY (ProductoID) REFERENCES productos(ProductoID)
+      )`);
+      });
+    }
+  }
+);
+
+// Nota: En SQLite, se usa db.all() para obtener múltiples filas, db.get() para una sola fila, y db.run() para INSERT/UPDATE/DELETE.
+
+// ----------------------------------------------------------------------
 // API routes for usuarios
+// ----------------------------------------------------------------------
+
+// GET All Usuarios
 app.get("/api/usuarios", (req, res) => {
-  pool.query(
+  // SQLite no necesita el alias 'AS' para UsuarioID.
+  db.all(
     "SELECT UsuarioID, nombre, email, Rol FROM usuarios",
     (err, results) => {
       if (err) {
-        console.error("Error querying usuarios:", err);
-        res.status(500).json({ error: "Error al obtener los usuarios" });
-        return;
+        console.error("Error querying usuarios:", err.message);
+        return res.status(500).json({ error: "Error al obtener los usuarios" });
       }
       res.json(results);
     }
   );
 });
 
+// POST New Usuario
 app.post("/api/usuarios", async (req, res) => {
   const { nombre, email, Rol, password } = req.body;
 
@@ -48,19 +84,22 @@ app.post("/api/usuarios", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { nombre, email, Rol, password: hashedPassword };
+    const sql =
+      "INSERT INTO usuarios (nombre, email, Rol, password) VALUES (?, ?, ?, ?)";
+    const params = [nombre, email, Rol, hashedPassword];
 
-    pool.query("INSERT INTO usuarios SET ?", newUser, (err, results) => {
+    // db.run ejecuta la query y usa `this.lastID` para el ID insertado
+    db.run(sql, params, function (err) {
       if (err) {
-        console.error("Error inserting usuario:", err);
-        res
+        console.error("Error inserting usuario:", err.message);
+        // Error 500 podría indicar una violación de UNIQUE (email)
+        return res
           .status(500)
-          .json({ error: "Error al crear el usuario", details: err });
-        return;
+          .json({ error: "Error al crear el usuario", details: err.message });
       }
       res.json({
         message: "Usuario creado correctamente",
-        id: results.insertId,
+        id: this.lastID, // SQLite property for the last inserted row ID
       });
     });
   } catch (error) {
@@ -68,191 +107,263 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
+// GET One Usuario
 app.get("/api/usuarios/:id", (req, res) => {
   const { id } = req.params;
-  pool.query(
+  // db.get es para obtener una sola fila
+  db.get(
     "SELECT UsuarioID, nombre, email, Rol FROM usuarios WHERE UsuarioID = ?",
     [id],
-    (err, results) => {
+    (err, result) => {
       if (err) {
-        console.error("Error querying usuario:", err);
-        res.status(500).json({ error: "Error al obtener el usuario" });
-        return;
+        console.error("Error querying usuario:", err.message);
+        return res.status(500).json({ error: "Error al obtener el usuario" });
       }
-      if (results.length === 0) {
+      if (!result) {
         return res.status(404).json({ error: "Usuario no encontrado" });
       }
-      res.json(results[0]);
+      res.json(result);
     }
   );
 });
 
+// PUT Update Usuario
 app.put("/api/usuarios/:id", async (req, res) => {
   const { id } = req.params;
-  const userData = req.body;
+  let userData = req.body;
 
-  // If a new password is provided, hash it.
+  // Si se proporciona una nueva contraseña, se hashea
   if (userData.password) {
     try {
       userData.password = await bcrypt.hash(userData.password, 10);
     } catch (error) {
-      return res.status(500).json({ error: "Error al encriptar la contraseña" });
+      return res
+        .status(500)
+        .json({ error: "Error al encriptar la contraseña" });
     }
   }
 
-  pool.query(
-    "UPDATE usuarios SET ? WHERE UsuarioID = ?",
-    [userData, id],
-    (err, results) => {
-      if (err) {
-        console.error("Error updating usuario:", err);
-        res.status(500).json({ error: "Error al actualizar el usuario" });
-        return;
-      }
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
-      res.json({ message: "Usuario actualizado correctamente" });
+  // Convertir el objeto userData a una lista de SET clauses y sus valores
+  const keys = Object.keys(userData);
+  const setClauses = keys.map((key) => `${key} = ?`).join(", ");
+  const params = keys.map((key) => userData[key]);
+  params.push(id); // Añadir el ID al final para la cláusula WHERE
+
+  if (keys.length === 0) {
+    return res.status(400).json({ error: "No hay datos para actualizar" });
+  }
+
+  const sql = `UPDATE usuarios SET ${setClauses} WHERE UsuarioID = ?`;
+
+  // db.run ejecuta la query y usa `this.changes` para ver filas afectadas
+  db.run(sql, params, function (err) {
+    if (err) {
+      console.error("Error updating usuario:", err.message);
+      return res.status(500).json({ error: "Error al actualizar el usuario" });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json({ message: "Usuario actualizado correctamente" });
+  });
 });
 
+// DELETE Usuario
 app.delete("/api/usuarios/:id", (req, res) => {
   const { id } = req.params;
-  pool.query(
-    "DELETE FROM usuarios WHERE UsuarioID = ?",
-    [id],
-    (err, results) => {
-      if (err) {
-        console.error("Error deleting usuario:", err);
-        res.status(500).json({ error: "Error al eliminar el usuario" });
-        return;
-      }
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
-      res.json({ message: "Usuario eliminado correctamente" });
+  db.run("DELETE FROM usuarios WHERE UsuarioID = ?", [id], function (err) {
+    if (err) {
+      console.error("Error deleting usuario:", err.message);
+      return res.status(500).json({ error: "Error al eliminar el usuario" });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json({ message: "Usuario eliminado correctamente" });
+  });
 });
 
+// ----------------------------------------------------------------------
 // API routes for productos
+// ----------------------------------------------------------------------
+
+// GET All Productos
 app.get("/api/productos", (req, res) => {
-  pool.query("SELECT * FROM productos", (err, results) => {
+  db.all("SELECT * FROM productos", (err, results) => {
     if (err) {
-      console.error("Error querying productos:", err);
-      res.status(500).json({ error: "Error al obtener los productos" });
-      return;
+      console.error("Error querying productos:", err.message);
+      return res.status(500).json({ error: "Error al obtener los productos" });
     }
     res.json(results);
   });
 });
 
+// GET One Producto
 app.get("/api/productos/:id", (req, res) => {
   const { id } = req.params;
-  pool.query("SELECT * FROM productos WHERE ProductoID = ?", [id], (err, results) => {
-    if (err) {
-      console.error("Error querying producto:", err);
-      res.status(500).json({ error: "Error al obtener el producto" });
-      return;
+  db.get(
+    "SELECT * FROM productos WHERE ProductoID = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        console.error("Error querying producto:", err.message);
+        return res.status(500).json({ error: "Error al obtener el producto" });
+      }
+      if (!result) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      res.json(result);
     }
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-    res.json(results[0]);
-  });
+  );
 });
 
+// POST New Producto
 app.post("/api/productos", (req, res) => {
   const nuevoProducto = req.body;
-  pool.query("INSERT INTO productos SET ?", nuevoProducto, (err, results) => {
+  const keys = Object.keys(nuevoProducto);
+  const placeholders = keys.map(() => "?").join(", ");
+  const sql = `INSERT INTO productos (${keys.join(
+    ", "
+  )}) VALUES (${placeholders})`;
+  const params = keys.map((key) => nuevoProducto[key]);
+
+  db.run(sql, params, function (err) {
     if (err) {
-      console.error("Error inserting producto:", err);
-      res.status(500).json({ error: "Error al agregar el producto" });
-      return;
+      console.error("Error inserting producto:", err.message);
+      return res.status(500).json({ error: "Error al agregar el producto" });
     }
     res.json({
       message: "Producto agregado correctamente",
-      id: results.insertId,
+      id: this.lastID,
     });
   });
 });
 
+// PUT Update Producto
 app.put("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   const updatedProducto = req.body;
-  pool.query(
-    "UPDATE productos SET ? WHERE ProductoID =  ?",
-    [updatedProducto, id],
-    (err, results) => {
-      if (err) {
-        console.error("Error updating producto:", err);
-        res.status(500).json({ error: "Error al actualizar el producto" });
-        return;
-      }
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Producto no encontrado" });
-      }
-      res.json({ message: "Producto actualizado correctamente" });
+
+  const keys = Object.keys(updatedProducto);
+  const setClauses = keys.map((key) => `${key} = ?`).join(", ");
+  const params = keys.map((key) => updatedProducto[key]);
+  params.push(id);
+
+  if (keys.length === 0) {
+    return res.status(400).json({ error: "No hay datos para actualizar" });
+  }
+
+  const sql = `UPDATE productos SET ${setClauses} WHERE ProductoID = ?`;
+
+  db.run(sql, params, function (err) {
+    if (err) {
+      console.error("Error updating producto:", err.message);
+      return res.status(500).json({ error: "Error al actualizar el producto" });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    res.json({ message: "Producto actualizado correctamente" });
+  });
 });
 
+// DELETE Producto
 app.delete("/api/productos/:id", (req, res) => {
   const { id } = req.params;
-  pool.query(
-    "DELETE FROM productos WHERE ProductoID = ?",
-    [id],
-    (err, results) => {
-      if (err) {
-        console.error("Error deleting producto:", err);
-        res.status(500).json({ error: "Error al eliminar el producto" });
-        return;
-      }
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Producto no encontrado" });
-      }
-      res.json({ message: "Producto eliminado correctamente" });
+  db.run("DELETE FROM productos WHERE ProductoID = ?", [id], function (err) {
+    if (err) {
+      console.error("Error deleting producto:", err.message);
+      return res.status(500).json({ error: "Error al eliminar el producto" });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    res.json({ message: "Producto eliminado correctamente" });
+  });
 });
 
+// GET Productos Nearing Expiry
+app.get("/api/productos/vencimiento", (req, res) => {
+  const DIAS_PARA_VENCER_UMBRAL = 30;
+  // SQLite usa julianday() para operaciones con fechas
+  const query = `
+    SELECT ProductoID, nombre, categoria, cantidad, vencimiento
+    FROM productos
+    WHERE vencimiento 
+    BETWEEN date('now', 'localtime') 
+    AND date('now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
+    AND cantidad > 0
+    ORDER BY vencimiento ASC
+  `;
+
+  db.all(query, (err, results) => {
+    if (err) {
+      console.error("Error querying productos por vencer:", err.message);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener los productos por vencer" });
+    }
+    res.json(results);
+  });
+});
+
+// ----------------------------------------------------------------------
+// API routes for movimientos (Entradas/Salidas)
+// ----------------------------------------------------------------------
+
+// POST Stock Entry (Entrada)
 app.post("/api/entradas", (req, res) => {
   const { nombreProductoEntrada, cantidadProductoEntrada } = req.body;
 
   if (!nombreProductoEntrada || !cantidadProductoEntrada) {
-    return res.status(400).json({ error: "Se requiere el producto y la cantidad." });
+    return res
+      .status(400)
+      .json({ error: "Se requiere el producto y la cantidad." });
   }
 
   const cantidad = parseInt(cantidadProductoEntrada, 10);
   if (isNaN(cantidad) || cantidad <= 0) {
-    return res.status(400).json({ error: "La cantidad debe ser un número positivo." });
+    return res
+      .status(400)
+      .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  pool.query(
+  // SQLite no soporta transacciones anidadas de forma fácil como MySQL,
+  // por lo que encadenamos las operaciones de actualización y registro.
+  // 1. Actualizar stock
+  db.run(
     "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
     [cantidad, nombreProductoEntrada],
-    (err, results) => {
+    function (err) {
       if (err) {
-        console.error("Error updating stock:", err);
-        res.status(500).json({ error: "Error al actualizar el stock del producto." });
-        return;
+        console.error("Error updating stock:", err.message);
+        return res
+          .status(500)
+          .json({ error: "Error al actualizar el stock del producto." });
       }
-      if (results.affectedRows === 0) {
+      if (this.changes === 0) {
         return res.status(404).json({ error: "Producto no encontrado." });
       }
 
-      // Log the movement
+      // 2. Registrar movimiento (Log the movement)
       const movimiento = {
         ProductoID: nombreProductoEntrada,
-        Tipo: 'Entrada',
-        Cantidad: cantidad
+        Tipo: "Entrada",
+        Cantidad: cantidad,
       };
-      pool.query("INSERT INTO movimientos SET ?", movimiento, (err, results) => {
+
+      const sqlMov =
+        "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
+      const paramsMov = [
+        movimiento.ProductoID,
+        movimiento.Tipo,
+        movimiento.Cantidad,
+      ];
+
+      db.run(sqlMov, paramsMov, (err) => {
         if (err) {
-          // If logging fails, just log the error to the console but don't send a response
-          // as the main operation was successful.
-          console.error("Error logging movement:", err);
+          console.error("Error logging movement:", err.message);
+          // La operación principal fue exitosa, solo se registra el error de log.
         }
       });
 
@@ -261,60 +372,74 @@ app.post("/api/entradas", (req, res) => {
   );
 });
 
+// POST Stock Exit (Salida)
 app.post("/api/salidas", (req, res) => {
   const { nombreProductoSalida, cantidadProductoSalida } = req.body;
 
   if (!nombreProductoSalida || !cantidadProductoSalida) {
-    return res.status(400).json({ error: "Se requiere el producto y la cantidad." });
+    return res
+      .status(400)
+      .json({ error: "Se requiere el producto y la cantidad." });
   }
 
   const cantidad = parseInt(cantidadProductoSalida, 10);
   if (isNaN(cantidad) || cantidad <= 0) {
-    return res.status(400).json({ error: "La cantidad debe ser un número positivo." });
+    return res
+      .status(400)
+      .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  // Check for sufficient stock before updating
-  pool.query(
+  // 1. Verificar stock
+  db.get(
     "SELECT cantidad FROM productos WHERE ProductoID = ?",
     [nombreProductoSalida],
-    (err, results) => {
+    (err, result) => {
       if (err) {
-        console.error("Error checking stock:", err);
+        console.error("Error checking stock:", err.message);
         return res.status(500).json({ error: "Error al verificar el stock." });
       }
 
-      if (results.length === 0) {
+      if (!result) {
         return res.status(404).json({ error: "Producto no encontrado." });
       }
 
-      const stockActual = results[0].cantidad;
+      const stockActual = result.cantidad;
       if (stockActual < cantidad) {
-        return res.status(400).json({ error: `Stock insuficiente. Solo quedan ${stockActual} unidades.` });
+        return res.status(400).json({
+          error: `Stock insuficiente. Solo quedan ${stockActual} unidades.`,
+        });
       }
 
-      // Proceed with the update
-      pool.query(
+      // 2. Proceder con la actualización
+      db.run(
         "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
         [cantidad, nombreProductoSalida],
-        (updateErr, updateResults) => {
+        function (updateErr) {
           if (updateErr) {
-            console.error("Error updating stock:", updateErr);
-            return res.status(500).json({ error: "Error al actualizar el stock del producto." });
-          }
-          if (updateResults.affectedRows === 0) {
-            // This case should ideally not be reached due to the check above
-            return res.status(404).json({ error: "Producto no encontrado." });
+            console.error("Error updating stock:", updateErr.message);
+            return res
+              .status(500)
+              .json({ error: "Error al actualizar el stock del producto." });
           }
 
-          // Log the movement
+          // 3. Registrar movimiento
           const movimiento = {
             ProductoID: nombreProductoSalida,
-            Tipo: 'Salida',
-            Cantidad: cantidad
+            Tipo: "Salida",
+            Cantidad: cantidad,
           };
-          pool.query("INSERT INTO movimientos SET ?", movimiento, (err, results) => {
-            if (err) {
-              console.error("Error logging movement:", err);
+
+          const sqlMov =
+            "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
+          const paramsMov = [
+            movimiento.ProductoID,
+            movimiento.Tipo,
+            movimiento.Cantidad,
+          ];
+
+          db.run(sqlMov, paramsMov, (logErr) => {
+            if (logErr) {
+              console.error("Error logging movement:", logErr.message);
             }
           });
 
@@ -325,6 +450,7 @@ app.post("/api/salidas", (req, res) => {
   );
 });
 
+// GET Movimientos Recientes
 app.get("/api/movimientos", (req, res) => {
   const query = `
     SELECT m.Tipo, m.Cantidad, m.Fecha, p.nombre AS ProductoNombre
@@ -333,15 +459,21 @@ app.get("/api/movimientos", (req, res) => {
     ORDER BY m.Fecha DESC
     LIMIT 5;
   `;
-  pool.query(query, (err, results) => {
+  // db.all es para obtener múltiples resultados
+  db.all(query, (err, results) => {
     if (err) {
-      console.error("Error querying movimientos:", err);
-      res.status(500).json({ error: "Error al obtener los movimientos" });
-      return;
+      console.error("Error querying movimientos:", err.message);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener los movimientos" });
     }
     res.json(results);
   });
 });
+
+// ----------------------------------------------------------------------
+// HTML Routes (No han cambiado)
+// ----------------------------------------------------------------------
 
 // Handle Chrome DevTools request
 app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {

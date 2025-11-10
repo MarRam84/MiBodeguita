@@ -37,19 +37,18 @@
             <option value="oscuro">Oscuro</option>
           </select>
         </div>
+        <div class="form-group">
+          <label for="stockCritico">Umbral de Stock Crítico:</label>
+          <input type="number" id="stockCritico" name="stockCritico" min="0" />
+        </div>
+        <div class="form-group">
+          <label for="diasVencimiento">Días para Aviso de Vencimiento:</label>
+          <input type="number" id="diasVencimiento" name="diasVencimiento" min="0" />
+        </div>
         <button type="submit" class="btn btn-primary">
           Guardar Configuración
         </button>
       </form>
     </div>
-    <script>
-      document
-        .getElementById("formConfiguracion")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          // Aquí puedes agregar la lógica para enviar los datos del formulario
-          alert("Formulario de Configuración Enviado (simulación)");
-        });
-    </script>
   </body>
 </html>

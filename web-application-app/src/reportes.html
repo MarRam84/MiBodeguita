@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reportes</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/print.css" media="print" />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
       rel="stylesheet"
@@ -19,6 +20,9 @@
   </head>
 
   <body>
+    <div class="print-logo">
+      <i class="fas fa-warehouse"></i> BodegaPro
+    </div>
     <h2>Reportes</h2>
     <form id="formReportes">
       <div class="form-group">
@@ -41,16 +45,16 @@
       <button type="submit" class="btn btn-primary">Generar Reporte</button>
     </form>
     <div id="reporteContainer">
-      <!-- Aquí se mostrará el reporte generado -->
+      <div id="reporteHeader" style="display: none;">
+        <h3 id="reporteTitulo"></h3>
+        <button id="btnImprimir" class="btn btn-secondary">
+          <i class="fas fa-print"></i> Imprimir
+        </button>
+      </div>
+      <div id="reporteContenido">
+        <canvas id="reporteGrafico"></canvas>
+        <!-- Aquí se mostrará el reporte generado -->
+      </div>
     </div>
-    <script>
-      document
-        .getElementById("formReportes")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          // Aquí puedes agregar la lógica para enviar los datos del formulario
-          alert("Formulario de Reportes Enviado (simulación)");
-        });
-    </script>
   </body>
 </html>
