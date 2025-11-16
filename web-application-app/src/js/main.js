@@ -213,13 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
       reporteHeader.style.display = "none";
 
       try {
-        let url = `${API_BASE_URL}/`;
+        let url;
         let data;
 
         switch (tipoReporte) {
           case "inventario":
-            url += `productos`; // No es necesario el API_BASE_URL aquí
-            const response = await fetch(`${API_BASE_URL}${url}`);
+            url = `${API_BASE_URL}/productos`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error("Error al cargar el inventario.");
             data = await response.json();
             renderizarReporteInventario(data);

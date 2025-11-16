@@ -37,6 +37,8 @@ const db = new sqlite3.Database(
         nombre TEXT NOT NULL,
         categoria TEXT,
         cantidad INTEGER DEFAULT 0,
+        ubicacion TEXT,
+        ingreso DATE,
         vencimiento DATE
       )`);
 
@@ -289,9 +291,9 @@ app.get("/api/productos/vencimiento", (req, res) => {
   const query = `
     SELECT ProductoID, nombre, categoria, cantidad, vencimiento
     FROM productos
-    WHERE vencimiento 
-    BETWEEN date('now', 'localtime') 
-    AND date('now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
+    WHERE strftime('%s', vencimiento)
+    BETWEEN strftime('%s', 'now', 'localtime')
+    AND strftime('%s', 'now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
     AND cantidad > 0
     ORDER BY vencimiento ASC
   `;
@@ -515,6 +517,6 @@ app.get("/salida", (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running at http://localhost:${port}`);
 });

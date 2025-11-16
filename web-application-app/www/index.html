@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang=es><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Gestión de Bodega</title><link rel=stylesheet href=/web-application-app.a6534bf6.css><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel=stylesheet><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin=anonymous referrerpolicy=no-referrer><script defer src=/web-application-app.e3aaaa9b.js></script><body>
+    <div class=app-container>
+      <aside class=sidebar>
+        <div class=logo><i class="fa-warehouse fas"></i> BodegaPro</div>
+        <nav role=navigation aria-label="Menú principal">
+          <ul>
+            <li class=active>
+              <a href=# data-section=inventario><i class="fa-boxes fas"></i> Inventario</a>
+            </li>
+            <li>
+              <a href=# data-section=entrada><i class="fa-sign-in-alt fas"></i> Entrada de productos</a>
+            </li>
+            <li>
+              <a href=# data-section=salida><i class="fa-sign-out-alt fas"></i> Salida de productos</a>
+            </li>
+            <li>
+              <a href=# data-section=reportes><i class="fa-chart-bar fas"></i> Reportes</a>
+            </li>
+            <li>
+              <a href=# data-section=usuarios><i class="fa-users fas"></i> Usuarios</a>
+            </li>
+            <li>
+              <a href=# data-section=configuracion><i class="fa-cog fas"></i> Configuración</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class=main-content>
+        <header class=header>
+          <h1><span id=header-title>Inventario</span></h1>
+          <div class=search-wrapper>
+            <i class="fa-search fas"></i>
+            <input placeholder=Buscar... class=search-bar>
+          </div>
+          <div class=header-icons>
+            <span class=notification><i class="fa-bell fas"></i></span>
+            <div class=profile>
+              <i class="fa-user fas"></i> Marlon Miranda
+              <i class="fa-caret-down fas"></i>
+            </div>
+          </div>
+          <button id=themeToggle class="btn btn-primary">
+            🌗 Cambiar tema
+          </button>
+        </header>
+
+        <div id=content-area>
+          
+        </div>
+      </main>
+    </div>
+
+    <div id=modal class="hidden modal" role=dialog aria-modal=true aria-labelledby=modalTitle>
+      <div class=modal-content>
+        <span id=modalClose class=modal-close tabindex=0 aria-label=Cerrar>×</span>
+        <h2 id=modalTitle></h2>
+        <div id=modalBody></div>
+      </div>
+    </div>
+
+    <script></script>
+  
+
