@@ -61,7 +61,7 @@ const db = new sqlite3.Database(
 // API routes for usuarios
 // ----------------------------------------------------------------------
 
-// GET All Usuarios
+// GET todos los Usuarios
 app.get("/api/usuarios", (req, res) => {
   // SQLite no necesita el alias 'AS' para UsuarioID.
   db.all(
@@ -76,7 +76,7 @@ app.get("/api/usuarios", (req, res) => {
   );
 });
 
-// POST New Usuario
+// POST Nuevo Usuario
 app.post("/api/usuarios", async (req, res) => {
   const { nombre, email, Rol, password } = req.body;
 
@@ -109,7 +109,7 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
-// GET One Usuario
+// GET Usuario
 app.get("/api/usuarios/:id", (req, res) => {
   const { id } = req.params;
   // db.get es para obtener una sola fila
@@ -129,7 +129,7 @@ app.get("/api/usuarios/:id", (req, res) => {
   );
 });
 
-// PUT Update Usuario
+// PUT Actualizar Usuario
 app.put("/api/usuarios/:id", async (req, res) => {
   const { id } = req.params;
   let userData = req.body;
@@ -186,10 +186,10 @@ app.delete("/api/usuarios/:id", (req, res) => {
 });
 
 // ----------------------------------------------------------------------
-// API routes for productos
+// API/Rutas
 // ----------------------------------------------------------------------
 
-// GET All Productos
+// Obtener Productos
 app.get("/api/productos", (req, res) => {
   db.all("SELECT * FROM productos", (err, results) => {
     if (err) {
@@ -200,7 +200,7 @@ app.get("/api/productos", (req, res) => {
   });
 });
 
-// GET One Producto
+// Obtener un Producto
 app.get("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   db.get(
@@ -219,7 +219,7 @@ app.get("/api/productos/:id", (req, res) => {
   );
 });
 
-// POST New Producto
+// POST Nuevo Producto
 app.post("/api/productos", (req, res) => {
   const nuevoProducto = req.body;
   const keys = Object.keys(nuevoProducto);
@@ -241,7 +241,7 @@ app.post("/api/productos", (req, res) => {
   });
 });
 
-// PUT Update Producto
+// PUT Actualizar Producto
 app.put("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   const updatedProducto = req.body;
@@ -269,7 +269,7 @@ app.put("/api/productos/:id", (req, res) => {
   });
 });
 
-// DELETE Producto
+// Borrar Producto
 app.delete("/api/productos/:id", (req, res) => {
   const { id } = req.params;
   db.run("DELETE FROM productos WHERE ProductoID = ?", [id], function (err) {
@@ -284,7 +284,7 @@ app.delete("/api/productos/:id", (req, res) => {
   });
 });
 
-// GET Productos Nearing Expiry
+// GET Productos Vencimiento Próximo
 app.get("/api/productos/vencimiento", (req, res) => {
   const DIAS_PARA_VENCER_UMBRAL = 30;
   // SQLite usa julianday() para operaciones con fechas
@@ -310,10 +310,10 @@ app.get("/api/productos/vencimiento", (req, res) => {
 });
 
 // ----------------------------------------------------------------------
-// API routes for movimientos (Entradas/Salidas)
+// API rutas para movimientos (Entradas/Salidas)
 // ----------------------------------------------------------------------
 
-// POST Stock Entry (Entrada)
+// POST Entrada
 app.post("/api/entradas", (req, res) => {
   const { nombreProductoEntrada, cantidadProductoEntrada } = req.body;
 
@@ -347,7 +347,7 @@ app.post("/api/entradas", (req, res) => {
         return res.status(404).json({ error: "Producto no encontrado." });
       }
 
-      // 2. Registrar movimiento (Log the movement)
+      // 2. Registrar movimiento
       const movimiento = {
         ProductoID: nombreProductoEntrada,
         Tipo: "Entrada",
@@ -374,7 +374,7 @@ app.post("/api/entradas", (req, res) => {
   );
 });
 
-// POST Stock Exit (Salida)
+// POST Salida
 app.post("/api/salidas", (req, res) => {
   const { nombreProductoSalida, cantidadProductoSalida } = req.body;
 
@@ -474,7 +474,7 @@ app.get("/api/movimientos", (req, res) => {
 });
 
 // ----------------------------------------------------------------------
-// HTML Routes (No han cambiado)
+// HTML Rutas (No han cambiado)
 // ----------------------------------------------------------------------
 
 // Handle Chrome DevTools request
@@ -516,7 +516,7 @@ app.get("/salida", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "salida.html"));
 });
 
-// Start the server
+// Iniciar Servidor
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running at http://localhost:${port}`);
 });
