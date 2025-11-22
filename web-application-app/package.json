@@ -1,15 +1,24 @@
 {
   "name": "web-application-app",
   "version": "1.0.0",
-  "description": "This project is a simple web application that demonstrates the separation of HTML, CSS, and JavaScript files.",
+  "description": "Sistema integral de inventario y ventas con Parcel y Capacitor",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "parcel build src/index.html --dist-dir www"
+    "build": "parcel build src/*.html --dist-dir www",
+    "sync": "npx cap sync",
+    "android": "npx cap open android",
+    "clean": "rimraf .parcel-cache www"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "parcel",
+    "capacitor",
+    "inventory",
+    "nodejs",
+    "mysql",
+    "sqlite"
+  ],
+  "author": "Marlon",
   "license": "ISC",
   "dependencies": {
     "@capacitor/android": "^7.4.4",
@@ -21,11 +30,12 @@
     "express": "^5.1.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.15.3",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "path": "^0.12.7",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "parcel": "^2.16.1"
+    "parcel": "^2.16.1",
+    "rimraf": "^5.0.0"
   }
 }

@@ -1,5 +1,6 @@
 {
   "appId": "com.marlon.bodega",
   "appName": "BodegaPro",
-  "webDir": "www"
+  "webDir": "www",
+  "bundledWebRuntime": false
 }
