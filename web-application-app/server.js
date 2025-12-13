@@ -200,6 +200,33 @@ app.get("/api/productos", (req, res) => {
   });
 });
 
+// GET Productos Vencimiento Próximo
+// IMPORTANTE: debe definirse antes de la ruta parametrizada `/api/productos/:id`
+// para evitar que Express trate `vencimiento` como un `:id` y se produzcan colisiones.
+app.get("/api/productos/vencimiento", (req, res) => {
+  const DIAS_PARA_VENCER_UMBRAL = 30;
+  // SQLite usa julianday() para operaciones con fechas
+  const query = `
+    SELECT ProductoID, nombre, categoria, cantidad, vencimiento
+    FROM productos
+    WHERE strftime('%s', vencimiento)
+    BETWEEN strftime('%s', 'now', 'localtime')
+    AND strftime('%s', 'now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
+    AND cantidad > 0
+    ORDER BY vencimiento ASC
+  `;
+
+  db.all(query, (err, results) => {
+    if (err) {
+      console.error("Error querying productos por vencer:", err.message);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener los productos por vencer" });
+    }
+    res.json(results);
+  });
+});
+
 // Obtener un Producto
 app.get("/api/productos/:id", (req, res) => {
   const { id } = req.params;
@@ -281,31 +308,6 @@ app.delete("/api/productos/:id", (req, res) => {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
     res.json({ message: "Producto eliminado correctamente" });
-  });
-});
-
-// GET Productos Vencimiento Próximo
-app.get("/api/productos/vencimiento", (req, res) => {
-  const DIAS_PARA_VENCER_UMBRAL = 30;
-  // SQLite usa julianday() para operaciones con fechas
-  const query = `
-    SELECT ProductoID, nombre, categoria, cantidad, vencimiento
-    FROM productos
-    WHERE strftime('%s', vencimiento)
-    BETWEEN strftime('%s', 'now', 'localtime')
-    AND strftime('%s', 'now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
-    AND cantidad > 0
-    ORDER BY vencimiento ASC
-  `;
-
-  db.all(query, (err, results) => {
-    if (err) {
-      console.error("Error querying productos por vencer:", err.message);
-      return res
-        .status(500)
-        .json({ error: "Error al obtener los productos por vencer" });
-    }
-    res.json(results);
   });
 });
 

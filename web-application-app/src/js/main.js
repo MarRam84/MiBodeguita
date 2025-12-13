@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // IMPORTANTE: Reemplaza la siguiente dirección con la IP de la computadora donde corre el servidor.
   const API_BASE_URL = "http://localhost:3000/api";
 
   const modal = document.getElementById("modal");
@@ -9,16 +10,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const contentArea = document.getElementById("content-area");
   const themeToggle = document.getElementById("themeToggle");
 
+  // Warn if important DOM nodes are missing to avoid runtime errors
+  if (!modal || !modalTitle || !modalBody || !modalClose || !modalContent) {
+    console.warn('Elementos del modal no encontrados en el DOM. Algunas funciones de UI pueden fallar.');
+  }
+  if (!contentArea) {
+    console.warn('Elemento `content-area` no encontrado en el DOM. El contenido dinámico no cargará.');
+  }
+
   // --- THEME --- //
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
   }
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  }
 
   // --- MODAL --- //
   function showModal(title, bodyHtml) {
@@ -40,8 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatearFecha(fechaString, includeTime = false) {
     if (!fechaString) return "N/A";
     const fecha = new Date(fechaString);
-    const userTimezoneOffset = fecha.getTimezoneOffset() * 60000;
-    const adjustedDate = new Date(fecha.getTime() + userTimezoneOffset);
+    if (isNaN(fecha)) return "N/A";
 
     const options = {
       day: "2-digit",
@@ -54,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       options.minute = "2-digit";
     }
 
-    return adjustedDate.toLocaleString("es-ES", options);
+    return fecha.toLocaleString("es-ES", options);
   }
 
   async function actualizarDashboard() {
@@ -749,7 +759,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function formatearFechaParaInput(fechaString) {
       if (!fechaString) return "";
       const fecha = new Date(fechaString);
-      fecha.setMinutes(fecha.getMinutes() + fecha.getTimezoneOffset());
+      if (isNaN(fecha)) return "";
       return fecha.toISOString().split("T")[0];
     }
 
