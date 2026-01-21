@@ -86,20 +86,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const DIAS_PARA_VENCER_UMBRAL = 30;
       const hoy = new Date();
 
-      const stockCritico = productos.filter(
+      const stockCriticoArray = productos.filter(
         (p) => p.cantidad < STOCK_CRITICO_UMBRAL
-      ).length;
-      const proximosAVencer = productos.filter((p) => {
+      );
+      const stockCritico = stockCriticoArray.length;
+      const proximosAVencerArray = productos.filter((p) => {
         if (!p.vencimiento) return false;
         const fechaVencimiento = new Date(p.vencimiento);
         const diffTiempo = fechaVencimiento.getTime() - hoy.getTime();
         const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
         return diffDias > 0 && diffDias <= DIAS_PARA_VENCER_UMBRAL;
-      }).length;
+      });
+      const proximosAVencer = proximosAVencerArray.length;
 
       document.getElementById("totalProductos").textContent = productos.length;
-      document.getElementById("stockCritico").textContent = stockCritico;
-      document.getElementById("proximosAVencer").textContent = proximosAVencer;
+      document.getElementById("stockCritico").textContent = stockCritico > 0 ? stockCriticoArray.map(p => p.nombre).join(', ') : '0';
+      document.getElementById("proximosAVencer").textContent = proximosAVencer > 0 ? proximosAVencerArray.map(p => p.nombre).join(', ') : '0';
 
       // Update movimientos
       const contenedor = document.getElementById("ultimosMovimientos");
