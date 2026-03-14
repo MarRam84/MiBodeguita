@@ -55,6 +55,21 @@ body {
   background-color: var(--sidebar-bg);
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar.collapsed .logo,
+.sidebar.collapsed nav ul li a span {
+  display: none;
+}
+
+.sidebar.collapsed nav ul li a {
+  justify-content: center;
+  padding: 15px;
 }
 
 .logo {
@@ -101,6 +116,44 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 15px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+#logoutBtn {
+  background-color: var(--btn-secondary, #6c757d);
+  color: #fff;
+}
+
+#logoutBtn:hover {
+  background-color: var(--btn-secondary-hover, #5a6268);
+}
+
+#sidebarToggle {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}
+
+#sidebarToggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .search-wrapper {
@@ -131,8 +184,8 @@ body {
 
 /* === Dashboard === */
 .dashboard {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
   margin-bottom: 20px;
 }
@@ -142,8 +195,14 @@ body {
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
 }
 
 /* === Tabla de Inventario === */
@@ -191,13 +250,24 @@ table {
   min-width: 700px;
   border-collapse: collapse;
   background-color: var(--card-bg);
+  font-size: 16px;
 }
 
 th,
 td {
-  padding: 10px 12px;
-  font-size: 18px;
+  padding: 12px 15px;
   text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: var(--sidebar-bg);
+  color: white;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
   border-bottom: 1px solid #ccc;
   color: var(--text-color);
 }
@@ -367,7 +437,7 @@ td:last-child button:hover {
   }
 
   .dashboard {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .search-bar {
@@ -381,6 +451,34 @@ td:last-child button:hover {
   .table-actions button {
     width: 100%;
     max-width: 200px;
+  }
+
+  #sidebarToggle {
+    display: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .sidebar {
+    width: 280px;
+  }
+
+  .sidebar.collapsed {
+    width: 70px;
+  }
+
+  .dashboard {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .main-content {
+    padding: 30px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .dashboard {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
