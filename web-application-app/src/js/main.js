@@ -2,21 +2,92 @@ document.addEventListener("DOMContentLoaded", () => {
   // IMPORTANTE: Reemplaza la siguiente dirección con la IP de la computadora donde corre el servidor.
   const API_BASE_URL = "http://localhost:3000/api";
 
-  const modal = document.getElementById("modal");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalBody = document.getElementById("modalBody");
-  const modalClose = document.getElementById("modalClose");
-  const modalContent = document.querySelector(".modal-content");
-  const contentArea = document.getElementById("content-area");
-  const themeToggle = document.getElementById("themeToggle");
+  // --- AUTENTICACIÓN --- //
+  const token = localStorage.getItem("authToken");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
-  // Warn if important DOM nodes are missing to avoid runtime errors
-  if (!modal || !modalTitle || !modalBody || !modalClose || !modalContent) {
-    console.warn('Elementos del modal no encontrados en el DOM. Algunas funciones de UI pueden fallar.');
+  // Función para verificar autenticación
+  async function checkAuth() {
+    if (!token) {
+      // No hay token, redirigir al login
+      window.location.href = "login.html";
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/verify`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        // Token inválido, limpiar y redirigir
+        logout();
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error verificando autenticación:", error);
+      logout();
+      return false;
+    }
   }
-  if (!contentArea) {
-    console.warn('Elemento `content-area` no encontrado en el DOM. El contenido dinámico no cargará.');
+
+  // Función de logout
+  function logout() {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
   }
+
+  // cerrar sesión automáticamente cuando el usuario cierra o recarga la página
+  window.addEventListener("beforeunload", () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+  });
+
+  // Verificar autenticación antes de continuar
+  checkAuth().then(isAuthenticated => {
+    if (!isAuthenticated) return;
+
+    // Continuar con la inicialización normal solo si está autenticado
+    initializeApp();
+  });
+
+  function initializeApp() {
+    // El resto del código de inicialización va aquí
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
+    const modalContent = document.querySelector(".modal-content");
+    const contentArea = document.getElementById("content-area");
+    const themeToggle = document.getElementById("themeToggle");
+
+    // Warn if important DOM nodes are missing to avoid runtime errors
+    if (!modal || !modalTitle || !modalBody || !modalClose || !modalContent) {
+      console.warn('Elementos del modal no encontrados en el DOM. Algunas funciones de UI pueden fallar.');
+    }
+    if (!contentArea) {
+      console.warn('Elemento `content-area` no encontrado en el DOM. El contenido dinámico no cargará.');
+    }
+
+    // Mostrar nombre del usuario en el header
+    if (user) {
+      const profileElement = document.querySelector(".profile");
+      if (profileElement) {
+        profileElement.innerHTML = `<i class="fas fa-user"></i> ${user.nombre} <i class="fas fa-caret-down"></i>`;
+      }
+    }
+
+    // Asegurarse de que el botón de logout tenga el handler
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", logout);
+    }
 
   // --- THEME --- //
   const savedTheme = localStorage.getItem("theme");
@@ -28,6 +99,21 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.toggle("dark");
       const isDark = document.body.classList.contains("dark");
       localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  }
+
+  // --- SIDEBAR TOGGLE --- //
+  const sidebarToggle = document.getElementById("sidebarToggle");
+  const sidebar = document.querySelector(".sidebar");
+  const savedSidebarState = localStorage.getItem("sidebarCollapsed");
+  if (savedSidebarState === "true") {
+    sidebar.classList.add("collapsed");
+  }
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      localStorage.setItem("sidebarCollapsed", isCollapsed);
     });
   }
 
@@ -214,6 +300,31 @@ document.addEventListener("DOMContentLoaded", () => {
     btnImprimir.addEventListener("click", () => {
       window.print();
     });
+
+    const btnGenerarPDF = document.getElementById('btnGenerarPDF');
+    if (btnGenerarPDF) {
+      btnGenerarPDF.addEventListener('click', async () => {
+        if (window.electronAPI && window.electronAPI.printToPDF) {
+          btnGenerarPDF.disabled = true;
+          btnGenerarPDF.textContent = 'Generando PDF...';
+          try {
+            const res = await window.electronAPI.printToPDF();
+            if (res && res.success) {
+              alert('PDF generado: ' + res.path);
+            } else {
+              alert('Error al generar PDF: ' + (res && res.error));
+            }
+          } catch (err) {
+            alert('Error al generar PDF: ' + err.message);
+          } finally {
+            btnGenerarPDF.disabled = false;
+            btnGenerarPDF.textContent = 'Generar PDF';
+          }
+        } else {
+          alert('Función de PDF no disponible (no está corriendo en Electron).');
+        }
+      });
+    }
 
     formReportes.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -772,9 +883,22 @@ document.addEventListener("DOMContentLoaded", () => {
           '<tr><td colspan="7">No hay productos en el inventario.</td></tr>';
         return;
       }
+      // obtener rol del usuario actual para decisiones de UI
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const restricted = ["Bodeguero", "Visor"];
       productos.forEach((producto) => {
         const fila = document.createElement("tr");
         fila.dataset.id = producto.ProductoID;
+        // construir botones condicionalmente
+        let botones = `
+            <button class="btn-eliminar" aria-label="Eliminar ${producto.nombre}"><i class="fas fa-trash-alt"></i> Eliminar</button>
+        `;
+        if (!restricted.includes(currentUser.rol)) {
+          botones = `
+            <button class="btn-editar" aria-label="Editar ${producto.nombre}"><i class="fas fa-edit"></i> Editar</button>
+            ${botones}
+          `;
+        }
         fila.innerHTML = `
           <td>${producto.nombre}</td>
           <td>${producto.categoria}</td>
@@ -782,14 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${producto.ubicacion || "N/A"}</td>
           <td>${formatearFecha(producto.ingreso)}</td>
           <td>${formatearFecha(producto.vencimiento)}</td>
-          <td>
-            <button class="btn-editar" aria-label="Editar ${
-              producto.nombre
-            }"><i class="fas fa-edit"></i> Editar</button>
-            <button class="btn-eliminar" aria-label="Eliminar ${
-              producto.nombre
-            }"><i class="fas fa-trash-alt"></i> Eliminar</button>
-          </td>
+          <td>${botones}</td>
         `;
         tablaProductos.appendChild(fila);
       });
@@ -1002,6 +1119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-  // --- INITIAL LOAD --- //
-  loadContent("inventario.html", "inventario");
+    // --- INITIAL LOAD --- //
+    loadContent("inventario.html", "inventario");
+  } // Fin de initializeApp
 });

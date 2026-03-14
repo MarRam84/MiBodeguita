@@ -32,32 +32,32 @@
           <ul>
             <li class="active">
               <a href="#" data-section="inventario"
-                ><i class="fas fa-boxes"></i> Inventario</a
+                ><i class="fas fa-boxes"></i> <span>Inventario</span></a
               >
             </li>
             <li>
               <a href="#" data-section="entrada"
-                ><i class="fas fa-sign-in-alt"></i> Entrada de productos</a
+                ><i class="fas fa-sign-in-alt"></i> <span>Entrada de productos</span></a
               >
             </li>
             <li>
               <a href="#" data-section="salida"
-                ><i class="fas fa-sign-out-alt"></i> Salida de productos</a
+                ><i class="fas fa-sign-out-alt"></i> <span>Salida de productos</span></a
               >
             </li>
             <li>
               <a href="#" data-section="reportes"
-                ><i class="fas fa-chart-bar"></i> Reportes</a
+                ><i class="fas fa-chart-bar"></i> <span>Reportes</span></a
               >
             </li>
             <li>
               <a href="#" data-section="usuarios"
-                ><i class="fas fa-users"></i> Usuarios</a
+                ><i class="fas fa-users"></i> <span>Usuarios</span></a
               >
             </li>
             <li>
               <a href="#" data-section="configuracion"
-                ><i class="fas fa-cog"></i> Configuración</a
+                ><i class="fas fa-cog"></i> <span>Configuración</span></a
               >
             </li>
           </ul>
@@ -66,21 +66,31 @@
 
       <main class="main-content">
         <header class="header">
-          <h1><span id="header-title">Inventario</span></h1>
-          <div class="search-wrapper">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Buscar..." class="search-bar" />
+          <div class="header-left">
+            <button id="sidebarToggle" class="btn btn-secondary" aria-label="Toggle sidebar">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1><span id="header-title">Inventario</span></h1>
           </div>
-          <div class="header-icons">
-            <span class="notification"><i class="fas fa-bell"></i></span>
-            <div class="profile">
-              <i class="fas fa-user"></i> Marlon Miranda
-              <i class="fas fa-caret-down"></i>
+          <div class="header-right">
+            <div class="search-wrapper">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Buscar..." class="search-bar" />
             </div>
+            <div class="header-icons">
+              <span class="notification"><i class="fas fa-bell"></i></span>
+              <div class="profile">
+                <i class="fas fa-user"></i> Marlon Miranda
+                <i class="fas fa-caret-down"></i>
+              </div>
+            </div>
+            <button id="logoutBtn" class="btn btn-secondary">
+              <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+            <button id="themeToggle" class="btn btn-primary">
+              🌗 Cambiar tema
+            </button>
           </div>
-          <button id="themeToggle" class="btn btn-primary">
-            🌗 Cambiar tema
-          </button>
         </header>
 
         <div id="content-area">

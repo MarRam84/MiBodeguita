@@ -4,13 +4,30 @@ const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose(); // Usar sqlite3
 const path = require("path");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_super_segura";
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Rutas específicas antes de archivos estáticos
+app.get("/", (req, res) => {
+  // Por defecto, servir el login. El cliente manejará la autenticación
+  res.sendFile(path.join(__dirname, "src", "login.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "login.html"));
+});
+
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "index.html"));
+});
+
 app.use(express.static(path.join(__dirname, "src")));
 
 // Conexión a la base de datos SQLite
@@ -56,6 +73,72 @@ const db = new sqlite3.Database(
 );
 
 // Nota: En SQLite, se usa db.all() para obtener múltiples filas, db.get() para una sola fila, y db.run() para INSERT/UPDATE/DELETE.
+
+// ----------------------------------------------------------------------
+// AUTENTICACIÓN
+// ----------------------------------------------------------------------
+
+// POST Login
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email y contraseña son requeridos" });
+  }
+
+  db.get(
+    "SELECT UsuarioID, nombre, email, Rol, password FROM usuarios WHERE email = ?",
+    [email],
+    async (err, user) => {
+      if (err) {
+        console.error("Error querying user:", err.message);
+        return res.status(500).json({ message: "Error interno del servidor" });
+      }
+      if (!user) {
+        return res.status(401).json({ message: "Credenciales incorrectas" });
+      }
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        return res.status(401).json({ message: "Credenciales incorrectas" });
+      }
+      const token = jwt.sign(
+        { userId: user.UsuarioID, email: user.email, role: user.Rol },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      res.json({ token, user: { id: user.UsuarioID, nombre: user.nombre, email: user.email, rol: user.Rol } });
+    }
+  );
+});
+
+// GET Verificar Token
+app.get("/api/verify", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token no proporcionado" });
+  }
+  const token = authHeader.substring(7);
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    res.json({ valid: true, user: decoded });
+  } catch (e) {
+    res.status(401).json({ message: "Token inválido" });
+  }
+});
+
+// Middleware para proteger rutas (opcional)
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Acceso denegado" });
+  }
+  const token = authHeader.substring(7);
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch (e) {
+    res.status(401).json({ message: "Token inválido" });
+  }
+}
 
 // ----------------------------------------------------------------------
 // API routes for usuarios
@@ -269,7 +352,13 @@ app.post("/api/productos", (req, res) => {
 });
 
 // PUT Actualizar Producto
-app.put("/api/productos/:id", (req, res) => {
+app.put("/api/productos/:id", authenticateToken, (req, res) => {
+  // solo usuarios que no sean bodeguero o visor pueden editar
+  const forbiddenRoles = ["Bodeguero", "Visor"];
+  if (forbiddenRoles.includes(req.user.role)) {
+    return res.status(403).json({ error: "No autorizado para actualizar productos" });
+  }
+
   const { id } = req.params;
   const updatedProducto = req.body;
 
@@ -485,8 +574,18 @@ app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {
 });
 
 // Serve the main HTML file
+
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "src", "index.html"));
+  // Verificar si hay un token válido en las cookies o headers
+  const authHeader = req.headers.authorization || req.headers.cookie;
+
+  if (authHeader && (authHeader.includes('authToken=') || authHeader.startsWith('Bearer '))) {
+    // Si hay token, servir el dashboard
+    res.sendFile(path.join(__dirname, "src", "index.html"));
+  } else {
+    // Si no hay token, redirigir al login
+    res.redirect('/login.html');
+  }
 });
 
 // Routes for other HTML pages
