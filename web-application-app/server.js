@@ -421,48 +421,65 @@ app.post("/api/entradas", (req, res) => {
       .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  // SQLite no soporta transacciones anidadas de forma fácil como MySQL,
-  // por lo que encadenamos las operaciones de actualización y registro.
-  // 1. Actualizar stock
-  db.run(
-    "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
-    [cantidad, nombreProductoEntrada],
-    function (err) {
-      if (err) {
-        console.error("Error updating stock:", err.message);
-        return res
-          .status(500)
-          .json({ error: "Error al actualizar el stock del producto." });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: "Producto no encontrado." });
-      }
+  // Usar transacción para asegurar atomicidad
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
 
-      // 2. Registrar movimiento
-      const movimiento = {
-        ProductoID: nombreProductoEntrada,
-        Tipo: "Entrada",
-        Cantidad: cantidad,
-      };
-
-      const sqlMov =
-        "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
-      const paramsMov = [
-        movimiento.ProductoID,
-        movimiento.Tipo,
-        movimiento.Cantidad,
-      ];
-
-      db.run(sqlMov, paramsMov, (err) => {
+    // 1. Actualizar stock
+    db.run(
+      "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
+      [cantidad, nombreProductoEntrada],
+      function (err) {
         if (err) {
-          console.error("Error logging movement:", err.message);
-          // La operación principal fue exitosa, solo se registra el error de log.
+          console.error("Error updating stock:", err.message);
+          db.run("ROLLBACK");
+          return res
+            .status(500)
+            .json({ error: "Error al actualizar el stock del producto." });
         }
-      });
+        if (this.changes === 0) {
+          db.run("ROLLBACK");
+          return res.status(404).json({ error: "Producto no encontrado." });
+        }
 
-      res.json({ message: "Entrada de stock registrada correctamente." });
-    }
-  );
+        // 2. Registrar movimiento
+        const movimiento = {
+          ProductoID: nombreProductoEntrada,
+          Tipo: "Entrada",
+          Cantidad: cantidad,
+        };
+
+        const sqlMov =
+          "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
+        const paramsMov = [
+          movimiento.ProductoID,
+          movimiento.Tipo,
+          movimiento.Cantidad,
+        ];
+
+        db.run(sqlMov, paramsMov, function (err) {
+          if (err) {
+            console.error("Error logging movement:", err.message);
+            db.run("ROLLBACK");
+            return res
+              .status(500)
+              .json({ error: "Error al registrar el movimiento." });
+          }
+
+          // Confirmar transacción
+          db.run("COMMIT", (err) => {
+            if (err) {
+              console.error("Error committing transaction:", err.message);
+              return res
+                .status(500)
+                .json({ error: "Error al confirmar la transacción." });
+            }
+            res.json({ message: "Entrada de stock registrada correctamente." });
+          });
+        });
+      }
+    );
+  });
 });
 
 // POST Salida
@@ -482,65 +499,87 @@ app.post("/api/salidas", (req, res) => {
       .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  // 1. Verificar stock
-  db.get(
-    "SELECT cantidad FROM productos WHERE ProductoID = ?",
-    [nombreProductoSalida],
-    (err, result) => {
-      if (err) {
-        console.error("Error checking stock:", err.message);
-        return res.status(500).json({ error: "Error al verificar el stock." });
-      }
+  // Usar transacción para asegurar atomicidad
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
 
-      if (!result) {
-        return res.status(404).json({ error: "Producto no encontrado." });
-      }
-
-      const stockActual = result.cantidad;
-      if (stockActual < cantidad) {
-        return res.status(400).json({
-          error: `Stock insuficiente. Solo quedan ${stockActual} unidades.`,
-        });
-      }
-
-      // 2. Proceder con la actualización
-      db.run(
-        "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
-        [cantidad, nombreProductoSalida],
-        function (updateErr) {
-          if (updateErr) {
-            console.error("Error updating stock:", updateErr.message);
-            return res
-              .status(500)
-              .json({ error: "Error al actualizar el stock del producto." });
-          }
-
-          // 3. Registrar movimiento
-          const movimiento = {
-            ProductoID: nombreProductoSalida,
-            Tipo: "Salida",
-            Cantidad: cantidad,
-          };
-
-          const sqlMov =
-            "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
-          const paramsMov = [
-            movimiento.ProductoID,
-            movimiento.Tipo,
-            movimiento.Cantidad,
-          ];
-
-          db.run(sqlMov, paramsMov, (logErr) => {
-            if (logErr) {
-              console.error("Error logging movement:", logErr.message);
-            }
-          });
-
-          res.json({ message: "Salida de stock registrada correctamente." });
+    // 1. Verificar stock
+    db.get(
+      "SELECT cantidad FROM productos WHERE ProductoID = ?",
+      [nombreProductoSalida],
+      (err, result) => {
+        if (err) {
+          console.error("Error checking stock:", err.message);
+          db.run("ROLLBACK");
+          return res.status(500).json({ error: "Error al verificar el stock." });
         }
-      );
-    }
-  );
+
+        if (!result) {
+          db.run("ROLLBACK");
+          return res.status(404).json({ error: "Producto no encontrado." });
+        }
+
+        const stockActual = result.cantidad;
+        if (stockActual < cantidad) {
+          db.run("ROLLBACK");
+          return res.status(400).json({
+            error: `Stock insuficiente. Solo quedan ${stockActual} unidades.`,
+          });
+        }
+
+        // 2. Actualizar stock
+        db.run(
+          "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
+          [cantidad, nombreProductoSalida],
+          function (updateErr) {
+            if (updateErr) {
+              console.error("Error updating stock:", updateErr.message);
+              db.run("ROLLBACK");
+              return res
+                .status(500)
+                .json({ error: "Error al actualizar el stock del producto." });
+            }
+
+            // 3. Registrar movimiento
+            const movimiento = {
+              ProductoID: nombreProductoSalida,
+              Tipo: "Salida",
+              Cantidad: cantidad,
+            };
+
+            const sqlMov =
+              "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
+            const paramsMov = [
+              movimiento.ProductoID,
+              movimiento.Tipo,
+              movimiento.Cantidad,
+            ];
+
+            db.run(sqlMov, paramsMov, function (logErr) {
+              if (logErr) {
+                console.error("Error logging movement:", logErr.message);
+                db.run("ROLLBACK");
+                return res
+                  .status(500)
+                  .json({ error: "Error al registrar el movimiento." });
+              }
+
+              // Confirmar transacción
+              db.run("COMMIT", (err) => {
+                if (err) {
+                  console.error("Error committing transaction:", err.message);
+                  return res
+                    .status(500)
+                    .json({ error: "Error al confirmar la transacción." });
+                }
+                res.json({ message: "Salida de stock registrada correctamente." });
+              });
+            });
+          }
+        );
+      }
+    );
+  });
 });
 
 // GET Movimientos Recientes
