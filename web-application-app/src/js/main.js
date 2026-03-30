@@ -43,7 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "login.html";
   }
 
+<<<<<<< HEAD
   // Nota: Se eliminó el logout forzado en recarga de página para mantener sesión activa.
+=======
+  // cerrar sesión automáticamente cuando el usuario cierra o recarga la página
+  window.addEventListener("beforeunload", () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+  });
+
+>>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
   // Verificar autenticación antes de continuar
   checkAuth().then(isAuthenticated => {
     if (!isAuthenticated) return;
@@ -956,6 +965,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return fecha.toISOString().split("T")[0];
     }
 
+    function esUsuarioAdmin() {
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const currentRole = (currentUser.rol || "").toString().trim().toLowerCase();
+      return ["admin", "administrador"].includes(currentRole);
+    }
+
     function renderizarProductos(productos) {
       tablaProductos.innerHTML = "";
       if (productos.length === 0) {
@@ -963,22 +978,23 @@ document.addEventListener("DOMContentLoaded", () => {
           '<tr><td colspan="7">No hay productos en el inventario.</td></tr>';
         return;
       }
-      // obtener rol del usuario actual para decisiones de UI
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const restricted = ["Bodeguero", "Visor"];
+
+      const isAdmin = esUsuarioAdmin();
+
       productos.forEach((producto) => {
         const fila = document.createElement("tr");
         fila.dataset.id = producto.ProductoID;
-        // construir botones condicionalmente
-        let botones = `
-            <button class="btn-eliminar" aria-label="Eliminar ${producto.nombre}"><i class="fas fa-trash-alt"></i> Eliminar</button>
-        `;
-        if (!restricted.includes(currentUser.rol)) {
+
+        let botones = "";
+        if (isAdmin) {
           botones = `
             <button class="btn-editar" aria-label="Editar ${producto.nombre}"><i class="fas fa-edit"></i> Editar</button>
-            ${botones}
+            <button class="btn-eliminar" aria-label="Eliminar ${producto.nombre}"><i class="fas fa-trash-alt"></i> Eliminar</button>
           `;
+        } else {
+          botones = `<span class="no-permiso">No autorizado</span>`;
         }
+
         fila.innerHTML = `
           <td>${producto.nombre}</td>
           <td>${producto.categoria}</td>
@@ -1060,6 +1076,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function handleEditarProducto(productoId) {
+      if (!esUsuarioAdmin()) {
+        alert("Solo los administradores pueden editar productos.");
+        return;
+      }
+
       try {
         const [productResponse, formResponse] = await Promise.all([
           fetch(`${API_BASE_URL}/productos/${productoId}`),
@@ -1103,6 +1124,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function handleEliminarProducto(productoId) {
+      if (!esUsuarioAdmin()) {
+        alert("Solo los administradores pueden eliminar productos.");
+        return;
+      }
+
       if (!confirm("¿Estás seguro de que quieres eliminar este producto?"))
         return;
 

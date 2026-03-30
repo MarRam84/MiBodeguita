@@ -353,9 +353,9 @@ app.post("/api/productos", (req, res) => {
 
 // PUT Actualizar Producto
 app.put("/api/productos/:id", authenticateToken, (req, res) => {
-  // solo usuarios que no sean bodeguero o visor pueden editar
-  const forbiddenRoles = ["Bodeguero", "Visor"];
-  if (forbiddenRoles.includes(req.user.role)) {
+  const userRole = (req.user.role || "").toString().trim().toLowerCase();
+  const allowedRoles = ["admin", "administrador"];
+  if (!allowedRoles.includes(userRole)) {
     return res.status(403).json({ error: "No autorizado para actualizar productos" });
   }
 
@@ -386,7 +386,13 @@ app.put("/api/productos/:id", authenticateToken, (req, res) => {
 });
 
 // Borrar Producto
-app.delete("/api/productos/:id", (req, res) => {
+app.delete("/api/productos/:id", authenticateToken, (req, res) => {
+  const userRole = (req.user.role || "").toString().trim().toLowerCase();
+  const allowedRoles = ["admin", "administrador"];
+  if (!allowedRoles.includes(userRole)) {
+    return res.status(403).json({ error: "No autorizado para eliminar productos" });
+  }
+
   const { id } = req.params;
   db.run("DELETE FROM productos WHERE ProductoID = ?", [id], function (err) {
     if (err) {
