@@ -43,12 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "login.html";
   }
 
-  // cerrar sesión automáticamente cuando el usuario cierra o recarga la página
-  window.addEventListener("beforeunload", () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-  });
-
+  // Nota: Se eliminó el logout forzado en recarga de página para mantener sesión activa.
   // Verificar autenticación antes de continuar
   checkAuth().then(isAuthenticated => {
     if (!isAuthenticated) return;
@@ -151,6 +146,82 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return fecha.toLocaleString("es-ES", options);
+  }
+
+  async function obtenerCategoriasUnicas() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/productos`);
+      if (!response.ok) throw new Error("No se pudo obtener la lista de productos.");
+      const productos = await response.json();
+      const categorias = new Set();
+
+      productos.forEach((p) => {
+        const categoria = (p.categoria || "").trim();
+        if (categoria) categorias.add(categoria);
+      });
+
+      const defaultCategorias = [
+        "alimentos",
+        "bebidas",
+        "limpieza",
+        "electronica",
+        "Herramientas",
+        "Ropa",
+        "Juguetes",
+        "Hogar",
+        "Muebles",
+        "Deportes",
+        "Salud",
+        "Mascotas",
+        "Calzado",
+        "otros",
+      ];
+
+      defaultCategorias.forEach((cat) => categorias.add(cat));
+
+      return Array.from(categorias).sort((a, b) =>
+        a.toLowerCase().localeCompare(b.toLowerCase(), "es", { sensitivity: "base" })
+      );
+    } catch (error) {
+      console.error("Error cargando categorías:", error);
+      return [
+        "alimentos",
+        "bebidas",
+        "limpieza",
+        "electronica",
+        "Herramientas",
+        "Ropa",
+        "Juguetes",
+        "Hogar",
+        "Muebles",
+        "Deportes",
+        "Salud",
+        "Mascotas",
+        "Calzado",
+        "otros",
+      ];
+    }
+  }
+
+  function poblarCategoriaSelect(select, categorias = [], selected = "") {
+    if (!select) return;
+
+    const placeholderValue = "";
+    select.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = placeholderValue;
+    placeholder.textContent = "Seleccionar Categoría";
+    select.appendChild(placeholder);
+
+    categorias.forEach((categoria) => {
+      const option = document.createElement("option");
+      option.value = categoria;
+      option.textContent = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+      select.appendChild(option);
+    });
+
+    if (selected) select.value = selected;
   }
 
   async function actualizarDashboard() {
@@ -590,6 +661,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function activarEntrada() {
     const formEntrada = document.getElementById("formEntrada");
     const selectProducto = document.getElementById("nombreProductoEntrada");
+    const selectCategoriaEntrada = document.getElementById("categoriaProductoEntrada");
+
+    obtenerCategoriasUnicas()
+      .then((categorias) => {
+        poblarCategoriaSelect(selectCategoriaEntrada, categorias);
+      })
+      .catch((error) => {
+        console.error("Error poblando categorías de entrada:", error);
+      });
 
     fetch(`${API_BASE_URL}/productos`)
       .then((response) => response.json())
@@ -996,8 +1076,12 @@ document.addEventListener("DOMContentLoaded", () => {
         showModal("Editar Producto", formHtml);
 
         const form = modalBody.querySelector("form");
+        const selectCategoria = form.querySelector("#categoria");
+        const categorias = await obtenerCategoriasUnicas();
+
+        poblarCategoriaSelect(selectCategoria, categorias, producto.categoria);
+
         form.querySelector("#nombre").value = producto.nombre;
-        form.querySelector("#categoria").value = producto.categoria;
         form.querySelector("#cantidad").value = producto.cantidad;
         form.querySelector("#ubicacion").value = producto.ubicacion;
         form.querySelector("#ingreso").value = formatearFechaParaInput(
@@ -1048,9 +1132,14 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch("agregar-producto.html");
           const formHtml = await response.text();
           showModal("Agregar Producto", formHtml);
-          modalBody
-            .querySelector("form")
-            .addEventListener("submit", handleAgregarProducto);
+
+          const form = modalBody.querySelector("form");
+          const selectCategoria = form.querySelector("#categoria");
+
+          const categorias = await obtenerCategoriasUnicas();
+          poblarCategoriaSelect(selectCategoria, categorias);
+
+          form.addEventListener("submit", handleAgregarProducto);
         } catch (error) {
           console.error("Error al cargar el formulario:", error);
           alert("Error al cargar el formulario de agregar producto.");
