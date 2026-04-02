@@ -18,7 +18,7 @@ function createWindow() {
   });
 
   // Carga la aplicación web desde el servidor local
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadURL('http://10.68.141.12:3000');
 
   // Abre las herramientas de desarrollo (opcional, quítalo en producción)
   mainWindow.webContents.openDevTools();

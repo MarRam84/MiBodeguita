@@ -67,6 +67,34 @@ const db = new sqlite3.Database(
         Fecha TEXT DEFAULT (datetime('now', 'localtime')),
         FOREIGN KEY (ProductoID) REFERENCES productos(ProductoID)
       )`);
+
+      // Asegurar que exista un admin inicial para login
+      db.get("SELECT count(*) as count FROM usuarios", (err, row) => {
+        if (err) {
+          console.error("Error checking users count:", err.message);
+          return;
+        }
+        if (!row || row.count === 0) {
+          const bcrypt = require("bcrypt");
+          bcrypt.hash("admin123", 10, (hashErr, hashedPassword) => {
+            if (hashErr) {
+              console.error("Error hashing admin password:", hashErr);
+              return;
+            }
+            db.run(
+              "INSERT OR IGNORE INTO usuarios (nombre, email, Rol, password) VALUES (?, ?, ?, ?)",
+              ["Administrador", "admin@bodega.com", "Admin", hashedPassword],
+              function (insertErr) {
+                if (insertErr) {
+                  console.error("Error inserting admin user:", insertErr.message);
+                  return;
+                }
+                console.log("Usuario admin por defecto creado (admin@bodega.com/admin123)");
+              }
+            );
+          });
+        }
+      });
       });
     }
   }

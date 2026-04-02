@@ -1,26 +1,26 @@
-<!DOCTYPE html><html lang=es><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Gestión de Bodega</title><link rel=stylesheet href=/agregar-producto.f281d655.css><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel=stylesheet><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin=anonymous referrerpolicy=no-referrer><script defer src=/web-application-app.91823710.js></script><body>
+<!DOCTYPE html><html lang=es><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Gestión de Bodega</title><link rel=stylesheet href=/agregar-producto.eeea073c.css><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel=stylesheet><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin=anonymous referrerpolicy=no-referrer><script defer src=/web-application-app.447f70d8.js></script><body>
     <div class=app-container>
       <aside class=sidebar>
         <div class=logo><i class="fa-warehouse fas"></i> BodegaPro</div>
         <nav role=navigation aria-label="Menú principal">
           <ul>
             <li class=active>
-              <a href=# data-section=inventario><i class="fa-boxes fas"></i> Inventario</a>
+              <a href=# data-section=inventario><i class="fa-boxes fas"></i> <span>Inventario</span></a>
             </li>
             <li>
-              <a href=# data-section=entrada><i class="fa-sign-in-alt fas"></i> Entrada de productos</a>
+              <a href=# data-section=entrada><i class="fa-sign-in-alt fas"></i> <span>Entrada de productos</span></a>
             </li>
             <li>
-              <a href=# data-section=salida><i class="fa-sign-out-alt fas"></i> Salida de productos</a>
+              <a href=# data-section=salida><i class="fa-sign-out-alt fas"></i> <span>Salida de productos</span></a>
             </li>
             <li>
-              <a href=# data-section=reportes><i class="fa-chart-bar fas"></i> Reportes</a>
+              <a href=# data-section=reportes><i class="fa-chart-bar fas"></i> <span>Reportes</span></a>
             </li>
             <li>
-              <a href=# data-section=usuarios><i class="fa-users fas"></i> Usuarios</a>
+              <a href=# data-section=usuarios><i class="fa-users fas"></i> <span>Usuarios</span></a>
             </li>
             <li>
-              <a href=# data-section=configuracion><i class="fa-cog fas"></i> Configuración</a>
+              <a href=# data-section=configuracion><i class="fa-cog fas"></i> <span>Configuración</span></a>
             </li>
           </ul>
         </nav>
@@ -28,21 +28,31 @@
 
       <main class=main-content>
         <header class=header>
-          <h1><span id=header-title>Inventario</span></h1>
-          <div class=search-wrapper>
-            <i class="fa-search fas"></i>
-            <input placeholder=Buscar... class=search-bar>
+          <div class=header-left>
+            <button id=sidebarToggle class="btn btn-secondary" aria-label="Toggle sidebar">
+              <i class="fa-bars fas"></i>
+            </button>
+            <h1><span id=header-title>Inventario</span></h1>
           </div>
-          <div class=header-icons>
-            <span class=notification><i class="fa-bell fas"></i></span>
-            <div class=profile>
-              <i class="fa-user fas"></i> Marlon Miranda
-              <i class="fa-caret-down fas"></i>
+          <div class=header-right>
+            <div class=search-wrapper>
+              <i class="fa-search fas"></i>
+              <input placeholder=Buscar... class=search-bar>
             </div>
+            <div class=header-icons>
+              <span class=notification><i class="fa-bell fas"></i></span>
+              <div class=profile>
+                <i class="fa-user fas"></i> Marlon Miranda
+                <i class="fa-caret-down fas"></i>
+              </div>
+            </div>
+            <button id=logoutBtn class="btn btn-secondary">
+              <i class="fa-sign-out-alt fas"></i> Salir
+            </button>
+            <button id=themeToggle class="btn btn-primary">
+              🌗 Cambiar tema
+            </button>
           </div>
-          <button id=themeToggle class="btn btn-primary">
-            🌗 Cambiar tema
-          </button>
         </header>
 
         <div id=content-area>

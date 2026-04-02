@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // IMPORTANTE: Reemplaza la siguiente dirección con la IP de la computadora donde corre el servidor.
-  const API_BASE_URL = "http://localhost:3000/api";
+  const API_BASE_URL = "http://10.68.141.12:3000/api";
 
   // --- AUTENTICACIÓN --- //
   const token = localStorage.getItem("authToken");
@@ -43,16 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "login.html";
   }
 
-<<<<<<< HEAD
   // Nota: Se eliminó el logout forzado en recarga de página para mantener sesión activa.
-=======
-  // cerrar sesión automáticamente cuando el usuario cierra o recarga la página
-  window.addEventListener("beforeunload", () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-  });
 
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
   // Verificar autenticación antes de continuar
   checkAuth().then(isAuthenticated => {
     if (!isAuthenticated) return;

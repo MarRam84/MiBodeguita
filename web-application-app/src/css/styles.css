@@ -267,7 +267,6 @@ th {
   position: sticky;
   top: 0;
   z-index: 10;
-}
   border-bottom: 1px solid #ccc;
   color: var(--text-color);
 }
