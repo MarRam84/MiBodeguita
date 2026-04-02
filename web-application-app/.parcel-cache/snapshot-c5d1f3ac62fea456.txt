@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 14835
 112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mysql2\lib\constants\field_flags.js134120322318276569 0
 91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\clone-response134120337190705945 1
@@ -11,77 +10,6 @@
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\android\app\src\main\res\mipmap-xxhdpi134114337733151424 1
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\business_diagram_summary.docx134185222987299904 0
 73C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\README.md134174701683878253 0
-=======
-14739
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\ajv\lib\compile\equal.js134120339419484637 0
-104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\decompress-response\license134120322277226440 0
-83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js134120339418790121 1
-111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mysql2\typings\mysql\lib\Auth.d.ts134120322348182796 0
-91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\rest.js134120339466010894 0
-149C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\msgpackr-extract\node_modules\node-gyp-build-optional-packages\README.md134120322316792946 0
-131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor\cli\node_modules\glob\dist\esm\index.js.map134120322341241872 0
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\undici-types\webidl.d.ts134120322290891589 0
-97C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\wcwidth\package.json134120339388071600 0
-106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\path-scurry\dist\esm\index.js134120322259506831 0
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\GF.js134120333507726813 0
-114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\core\lib\public\Dependency.js134120333490725088 0
-80C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\entrada.html134114337733311312 0
-118C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\universal\dist\esm\debug.js.map134120339413583892 0
-112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\tar\node_modules\minipass\README.md134120322312166594 0
-90C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\now.js134120339463762519 0
-85C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\capacitor.config.json134114337733250996 0
-98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\imurmurhash\README.md134120322272314420 0
-116C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\make-fetch-happen\node_modules\minipass134120322315588433 1
-74C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\.gitignore134114337732431045 0
-94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mysql2\promise.js134120322340286206 0
-131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\http2-wrapper\source\utils\is-request-pseudo-header.js134120337194770117 0
-121C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\windows-sign\dist\esm\utils\log.js134120339402183539 0
-115C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\transformer-babel\lib\utils.js134120333477779708 0
-87C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\strip-ansi134120322259681951 1
-105C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\compare-version\package.json134120339396986014 0
-95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\sqlstring\index.js134120322259850608 0
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\sqlite3\binding.gyp134120322263365886 0
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\iconv-lite\.idea\vcs.xml134120322307568401 0
-100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@ionic\utils-fs\LICENSE134120322305942597 0
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\VU.js134120333520111903 0
-89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\reportes.61fbbab0.css134120344276392476 0
-89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\agregar-producto.html134120340649072847 0
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\prebuild-install\LICENSE134120322262644076 0
-113C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@types\node\inspector.generated.d.ts134120322310167887 0
-145C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\node-gyp-build-optional-packages\node_modules\detect-libc\index.d.ts134120322317647256 0
-100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\source-map\package.json134120339390355607 0
-82C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mysql134120322341637169 1
-121C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\out\targets\ArchiveTarget.js134120339416042683 0
-103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\undici-types\formdata.d.ts134120322271335045 0
-131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\out\util\rebuild\remote-rebuild.js.map134120339451817775 0
-94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\minipass-pipeline134120322269447472 1
-114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js\dist\esnext\regexps-uri.js.map134120339411964047 0
-70C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js134114337733339936 1
-89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\agregar-producto.html134114337733291272 0
-99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\isTypedArray.js134120339460962233 0
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\ajv\lib\dot\contains.jst134120339429157409 0
-92C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\plist\.jshintrc134120322262944228 0
-110C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\readable-stream\duplex-browser.js134120322274149870 0
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\socks\typings\common\util.d.ts134120322300096946 0
-86C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\temp-file134120339398754006 1
-93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\method.js134120339463287528 0
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\object-inspect\readme.markdown134120322296402950 0
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\utils\src\collection.js134120333471860254 0
-115C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\rimraf\dist\esm\rimraf-manual.d.ts.map134120322342627089 0
-128C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\notarize\node_modules\fs-extra\lib\ensure134120339399177077 1
-88C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\Logo moderno para ap.png134114337732767911 0
-100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\pe-library\package.json134120339412627033 0
-97C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@ionic\utils-process134120322307878884 1
-88C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\tar-fs\test134120322271280743 1
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\side-channel-map\test\index.js134120322262840221 0
-122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\tiny-async-pool\node_modules\semver\README.md134120339409233740 0
-118C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\typescript\lib\lib.decorators.legacy.d.ts134120339442938290 0
-114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\yargs\build\lib\utils\process-argv.js134120339414211259 0
-133C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mysql2\typings\mysql\lib\protocol\sequences\Prepare.d.ts134120322356584104 0
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\object-inspect\test-core-js.js134120322290624853 0
-103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\object-keys\isArguments.js134120337192255507 0
-73C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\README.md134114337732825471 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 113C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\workers\src\web\WebWorker.js134120333485519052 0
 86C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\is-docker134120322274352052 1
 88C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\sqlite3\src134120322306176099 1
@@ -107,7 +35,7 @@
 131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\out\util\rebuild\remote-rebuild.js.map134120339451817775 0
 94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\minipass-pipeline134120322269447472 1
 114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js\dist\esnext\regexps-uri.js.map134120339411964047 0
-70C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js134174702633783309 1
+70C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js134193714749830239 1
 89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\agregar-producto.html134185947372412107 0
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\isTypedArray.js134120339460962233 0
 101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\ajv\lib\dot\contains.jst134120339429157409 0
@@ -260,7 +188,6 @@
 122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\builder-util\node_modules\fs-extra\lib\remove134120339419816630 1
 90C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\plist\.github134120322286674771 1
 95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\cliui\CHANGELOG.md134120339390170792 0
-<<<<<<< HEAD
 138C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\node-gyp\node_modules\cacache\lib\util\fix-owner.js134120339406763280 0
 98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\safer-buffer\tests.js134120322265367002 0
 111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\rimraf\dist\commonjs\path-arg.d.ts134120322356030217 0
@@ -271,30 +198,6 @@
 115C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\iconv-lite\encodings\tables\cp950.json134120322295431468 0
 107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\prompts\lib\elements\select.js134120322328104368 0
 76C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules134174714345215361 1
-=======
-95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\chunk.js134120339444656988 0
-113C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lmdb\dependencies\lz4\lib\lz4frame.c134120322325632591 0
-93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\abbrev\abbrev.js134120322283359204 0
-104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\side-channel-list\README.md134120322266322731 0
-122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\electron\node_modules\undici-types\fetch.d.ts134120337196561981 0
-71C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\android134114337733250996 1
-103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\xmlbuilder\lib\XMLDummy.js134120322286100242 0
-124C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\typescript\lib\lib.es2020.symbol.wellknown.d.ts134120339450468921 0
-133C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\watcher\node_modules\node-addon-api\package.json134120322325900642 0
-95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\minizlib\README.md134120322270472732 0
-99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\web-application-app.b6b74f74.js134114337733384642 0
-77C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\inventario.db134120325030432802 0
-111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\rimraf\dist\commonjs\path-arg.d.ts134120322356030217 0
-127C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\intro.doc134120322356678495 0
-100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\roarr\dist\types.js.map134120337198808956 0
-82C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\isexe134120322274500855 1
-138C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\node-gyp\node_modules\cacache\lib\util\fix-owner.js134120339406763280 0
-98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\safer-buffer\tests.js134120322265367002 0
-103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\toSafeInteger.js134120339469037708 0
-115C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\iconv-lite\encodings\tables\cp950.json134120322295431468 0
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\prompts\lib\elements\select.js134120322328104368 0
-76C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules134120339381021298 1
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 135C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lmdb\dependencies\lmdb-data-v1\libraries\liblmdb\COPYRIGHT134120322272740671 0
 121C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\universal\dist\cjs\file-utils.d.ts134120339420244910 0
 95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\props.js134120339465100073 0
@@ -312,14 +215,6 @@
 95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\utility-types\dist134120322275197160 1
 128C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\typescript\lib\pl\diagnosticMessages.generated.json134120339438732351 0
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\reportes.899a8036.css.map134120345393656112 0
-<<<<<<< HEAD
-=======
-88C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\cross-spawn134120322286812944 1
-118C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\type-fest\source\require-exactly-one.d.ts134120322291996161 0
-91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@types\node\fs134120322335294150 1
-83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\dotenv134120322286957781 1
-95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\.package-lock.json134120339545956476 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\node_modules\dotenv\lib\cli-options.js134120339386370597 0
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js\package.json134120339404085537 0
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\node-gyp\bin134120339450741665 1
@@ -346,7 +241,7 @@
 101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\pstree.remy\lib\index.js134120322266538252 0
 113C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\typescript\lib\lib.es2015.proxy.d.ts134120339444636897 0
 104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js\dist\esnext\uri.d.ts134120339422361613 0
-73C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\server.js134181656906166352 0
+73C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\server.js134193716229620882 0
 81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mime134120339394068954 1
 103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\glob\dist\esm\has-magic.js134120322259664701 0
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\utf8-byte-length\index.js134120339387202821 0
@@ -360,24 +255,12 @@
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\string-width\package.json134120322259122754 0
 112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\node-gyp\gyp\tools\pretty_vcproj.py134120322356564859 0
 114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\resedit\dist\_esm\sign\timestamp.d.ts134120339441229735 0
-<<<<<<< HEAD
 67C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src134174702514575597 1
-=======
-67C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src134135064635729994 1
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\yargs\helpers\index.js134120339409508328 0
 112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor\cli\dist\util\promise.js134120322347686941 0
 109C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\strip-json-comments\package.json134120322257750004 0
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\commander\lib\error.js134120322284523226 0
 111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\utility-types\dist\mapped-types.js134120322258141254 0
-<<<<<<< HEAD
-=======
-67C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www134135064931839026 1
-88C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\cacache\lib134120322294697861 1
-111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\native-run\dist\ios\utils\xcode.js134120322342611451 0
-141C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor\cli\node_modules\rimraf\dist\commonjs\use-native.d.ts134120322360734455 0
-81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\css\print.css134135063634716810 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\tar-fs134120322281099915 1
 116C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\jackspeak\dist\commonjs\parse-args.d.ts134120322289257696 0
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\reportes.ea27bdc3.css.map134120340650131910 0
@@ -494,27 +377,13 @@
 139C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\electron-winstaller\node_modules\fs-extra\lib\remove\rimraf.js134120339421092033 0
 100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\supports-color\index.js134120322258879957 0
 122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\out\asar\asarFileChecker.d.ts134120339457956943 0
-<<<<<<< HEAD
 78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\index.html134174721566189470 0
-=======
-78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\index.html134114337733311312 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\xmlbuilder\lib\XMLDTDElement.js134120322283793244 0
 91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\hasown\LICENSE134120322274574594 0
 98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\includes.js134120339456734518 0
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\plist\History.md134120322285762702 0
 117C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\resedit\dist\resource\VersionFileOS.d.ts134120339443297806 0
 89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\reportes.2db74705.css134135063586880723 0
-<<<<<<< HEAD
-=======
-81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\.bin134120339487529375 1
-114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\type-fest\source\set-return-type.d.ts134120322295356499 0
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\jackspeak\dist\esm\index.js.map134120322276160918 0
-93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\file-uri-to-path134120322282648448 1
-122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\fast-json-stable-stringify\benchmark\index.js134120339395625597 0
-112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\typescript\lib\lib.es2019.full.d.ts134120339449441028 0
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\unionWith.js134120339469660863 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 121C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\watcher\scripts\build-from-source.js134120322324481905 0
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\untildify\readme.md134120322258013390 0
 122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\dir-compare\build\src\FileSystem\FsPromise.js134120339411051599 0
@@ -593,36 +462,12 @@
 106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\ip-address\dist\common.js.map134120322289277778 0
 128C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\xml2js\node_modules\xmlbuilder\lib\XMLDTDAttList.js134120322328973594 0
 79C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\salida.html134120340649072847 0
-<<<<<<< HEAD
 104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@lezer\common\dist\index.js134120333483422859 0
 83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\denque134120322282945685 1
 85C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\inherits134120322274190931 1
 78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\login.html134174725818942460 0
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lmdb\src\v8-functions.cpp134120322356112636 0
 89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\bignumber.js134120322289508357 1
-=======
-99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\simple-update-notifier134120322263047959 1
-78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js\main.js134135064897358072 0
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\_stackHas.js134120339438967294 0
-81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\once134120322266293378 1
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\reject.js134120339465789287 0
-89C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\dunder-proto134120322288509851 1
-105C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\object-inspect\example\fn.js134120322278784721 0
-113C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\roarr\dist\factories\createLogger.js134120337196466030 0
-114C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor\core\types\web-plugin.d.ts134120322327322509 0
-104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\package-manager\src134120333485240721 1
-107C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\sprintf-js\dist\.gitattributes134120337188440814 0
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\get-port\index.d.ts134120322274049832 0
-125C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\templates\linux\after-remove.tpl134120339457125204 0
-122C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\features\text-decoration.js134120333518624263 0
-92C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\get-caller-file134120339388595374 1
-112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\uri-js\dist\esnext\schemes\wss.d.ts134120339424459015 0
-81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\usuarios.html134120340649072847 0
-100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\pstree.remy\.travis.yml134120322274466202 0
-96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\has-unicode\LICENSE134120322274426646 0
-106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@swc\helpers\_\_object_spread134120333500336785 1
-90C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\vary\index.js134120322256777557 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\www\web-application-app.154360df.js134120341918802041 0
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\get-stream\index.js134120337193473700 0
 110C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\prompts\lib\dateparts\datepart.js134120322284753380 0
@@ -663,30 +508,6 @@
 130C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\xml2js\node_modules\xmlbuilder\lib\XMLStringWriter.js134120322338272243 0
 83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\mkdirp134120322279025804 1
 128C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\hosted-git-info\node_modules\lru-cache\package.json134120339386460712 0
-<<<<<<< HEAD
-=======
-127C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\https-proxy-agent\dist\parse-proxy-response.js.map134120322281364335 0
-94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\node-gyp\gyp\data134120322278795464 1
-131C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\pe-library\dist\_esm\format\ImageOptionalHeader64.d.ts134120339424197193 0
-99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\picomatch\CHANGELOG.md134120322272712466 0
-91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\to-regex-range134120322259005915 1
-99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\async\parallelLimit.js134120339419901894 0
-98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\utility-types\LICENSE134120322254425076 0
-110C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor\cli\dist\tasks\init.js134120322341168850 0
-105C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\xmlbuilder\lib\XMLElement.js134120322287002367 0
-137C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\universal\node_modules\minimatch\dist\esm\ast.d.ts134120339413707273 0
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\MY.js134120333513661522 0
-101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\side-channel-list\.nycrc134120322261088445 0
-94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\wcwidth\Readme.md134120339390921961 0
-144C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@swc\helpers\_\_class_static_private_field_destructure\package.json134120333498778204 0
-102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\semver\functions\parse.js134120322295539340 0
-140C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\watcher\node_modules\node-addon-api\tools\conversion.js134120322323764250 0
-137C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\node_modules\minimatch\dist\esm\index.js.map134120339407032853 0
-98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\object-keys\README.md134120337193236601 0
-71C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\css134114337733311312 1
-94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\es-errors\eval.js134120322277007507 0
-87C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\globalthis134120337196466030 1
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\pe-library\dist\type\index.d.ts134120339426292886 0
 111C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\iconv-lite\encodings\dbcs-codec.js134120322275088464 0
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\temp\lib\temp.js134120339391988362 0
@@ -714,9 +535,8 @@
 98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\yargs\build\lib\utils134120339417765469 1
 81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\usuarios.html134114337733339936 0
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\camelCase.js134120339444115937 0
-<<<<<<< HEAD
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\simple-update-notifier134120322263047959 1
-78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js\main.js134193709600738145 0
+78C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\src\js\main.js134193716229772399 0
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\_stackHas.js134120339438967294 0
 81C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\once134120322266293378 1
 96C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\reject.js134120339465789287 0
@@ -753,8 +573,6 @@
 91C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@types\node\fs134120322335294150 1
 83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\dotenv134120322286957781 1
 95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\.package-lock.json134174714355505889 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\rimraf\dist\commonjs\index.d.ts.map134120322326781651 0
 87C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\ip-address134120322304241455 1
 140C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\body-parser\node_modules\iconv-lite\encodings\tables\eucjp.json134120333485998076 0
@@ -763,17 +581,12 @@
 94C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\undefsafe\LICENSE134120322257014364 0
 98C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\undefsafe\.travis.yml134120322260152143 0
 95C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\first.js134120339454155079 0
-<<<<<<< HEAD
 124C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\watcher\src\shared\BruteForceBackend.hh134120322303811011 0
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\semver\functions\major.js134120322288749897 0
 85C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@develar134120339380877465 1
 82C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\kleur134120322275581801 1
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\range-parser\package.json134120322261663170 0
 84C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\isarray134120322275243956 1
-=======
-87C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@capacitor134120322236280617 1
-93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\electron-publish134120339420042854 1
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 104C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\semver-compare\package.json134120337191340195 0
 137C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\electron\node_modules\@types\node\web-globals\navigator.d.ts134120337201107563 0
 115C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\rebuild\lib\search-module.js134120339413957644 0
@@ -2230,10 +2043,7 @@
 127C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\electron-winstaller\node_modules\fs-extra\lib\move134120339419816630 1
 134C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\tar-stream\node_modules\readable-stream\errors-browser.js134120322321956728 0
 97C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\lodash\fp\pullAll.js134120339465232969 0
-<<<<<<< HEAD
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\jws\lib\sign-stream.js134174714351261794 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 93C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\rimraf\README.md134120322349180898 0
 137C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\node-gyp\node_modules\unique-filename\lib\index.js134120339405111904 0
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\MN.js134120333513008300 0
@@ -2420,10 +2230,7 @@
 137C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\through2\node_modules\readable-stream\experimentalWarning.js134120322323295074 0
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\yargs\build\lib\yerror.js134120339419338017 0
 82C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\which134120322257177674 1
-<<<<<<< HEAD
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\jws\lib\data-stream.js134174714350918691 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 83C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\wrappy134120322253683359 1
 101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\7zip-bin\win\x64\7za.exe134120339433141335 0
 121C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\bcrypt\prebuilds\linux-x64\bcrypt.glibc.node134120322303737870 0
@@ -2789,10 +2596,6 @@
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\AR.js134120333479778594 0
 102C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\restore-cursor\index.d.ts134120339388706936 0
 100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\y18n\build\lib\index.js134120339389643865 0
-<<<<<<< HEAD
-=======
-108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\AR.js134120333479778594 0
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\y18n\build\lib\platform-shims134120339391032287 1
 101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\temp\node_modules\rimraf134120339406135297 1
 127C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\minipass-pipeline\node_modules\minipass\index.d.ts134120322315313018 0
@@ -5257,10 +5060,7 @@
 132C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@swc\helpers\_\_class_apply_descriptor_set\package.json134120333497779593 0
 100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@types\node\timers.d.ts134120322326634214 0
 136C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\roarr\dist\factories\createRoarrInititialGlobalState.js.map134120337198649216 0
-<<<<<<< HEAD
 106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\roarr\dist\factories\index.js134120337196864804 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 105C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@ionic\utils-fs\node_modules134120322236352791 1
 130C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\react-refresh\cjs\react-refresh-runtime.production.js134120322267051837 0
 110C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\roarr\dist\factories\index.js.map134120337198726159 0
@@ -7588,12 +7388,9 @@
 133C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\core\test\fixtures\invalid-target-source-missing134120333499849702 1
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\math-intrinsics\max.js134120322275883263 0
 106C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\math-intrinsics\test\index.js134120322271756962 0
-<<<<<<< HEAD
 99C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\math-intrinsics\mod.js134120322283101321 0
 125C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\node-gyp\node_modules\http-proxy-agent134120339409686626 1
 101C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\math-intrinsics\pow.d.ts134120322295798065 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 103C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\math-intrinsics\round.d.ts134120322296402950 0
 123C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@parcel\error-overlay\src\utils\stack-frame.js134120333486920852 0
 109C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\app-builder-lib\out\asar\asar.js134120339416585667 0
@@ -11066,11 +10863,8 @@
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\GP.js134120333507968597 0
 112C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@electron\fuses\dist\constants.d.ts134120339408510696 0
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\GR.js134120333508008747 0
-<<<<<<< HEAD
 100C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\@swc\helpers\_\_extends134120333499399380 1
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\HR.js134120333508461570 0
-=======
->>>>>>> 04db19242c35eff6d8560924fdda4db4890a3cc7
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\HU.js134120333508620956 0
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\IE.js134120333508620956 0
 108C:\Users\DELL 5401\source\repos\MiBodeguita\web-application-app\node_modules\caniuse-lite\data\regions\IL.js134120333508783765 0
