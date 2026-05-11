@@ -1,13 +1,13 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose(); // Usar sqlite3
+const mysql = require("mysql2"); // Usar mysql2
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_super_segura";
 
 // Middleware
@@ -15,11 +15,6 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas específicas antes de archivos estáticos
-app.get("/", (req, res) => {
-  // Por defecto, servir el login. El cliente manejará la autenticación
-  res.sendFile(path.join(__dirname, "src", "login.html"));
-});
-
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "login.html"));
 });
@@ -30,77 +25,147 @@ app.get("/dashboard", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "src")));
 
-// Conexión a la base de datos SQLite
-// Se usará una base de datos basada en archivos llamada 'inventario.db'
-const db = new sqlite3.Database(
-  path.join(__dirname, "inventario.db"),
-  (err) => {
+// Conexión a la base de datos MySQL
+const dbHost = process.env.DB_HOST?.trim() || "localhost";
+const dbPort = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306;
+const dbUser = process.env.DB_USER?.trim() || "root";
+const dbPassword = process.env.DB_PASSWORD ?? "";
+const dbName = process.env.DB_NAME?.trim() || "mibodeguita";
+
+// Inicializamos el pool directamente con la base de datos definida
+let pool = mysql.createPool({
+  host: dbHost,
+  port: dbPort,
+  user: dbUser,
+  password: dbPassword,
+  database: dbName,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+console.log("MySQL config:", {
+  host: dbHost,
+  port: dbPort,
+  user: dbUser,
+  database: dbName,
+});
+function initDatabase(callback) {
+  // 1. Inicializar las tablas si no existen en MySQL
+  pool.query(`CREATE TABLE IF NOT EXISTS usuarios (
+    UsuarioID INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    Rol VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL
+  )`, (err) => {
     if (err) {
-      console.error("Error al abrir la base de datos SQLite:", err.message);
-    } else {
-      console.log("Conectado a la base de datos SQLite 'inventario.db'.");
-      // Inicializar las tablas si no existen
-      db.serialize(() => {
-        db.run(`CREATE TABLE IF NOT EXISTS usuarios (
-        UsuarioID INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        Rol TEXT NOT NULL,
-        password TEXT NOT NULL
-      )`);
-
-        db.run(`CREATE TABLE IF NOT EXISTS productos (
-        ProductoID INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        categoria TEXT,
-        cantidad INTEGER DEFAULT 0,
-        ubicacion TEXT,
-        ingreso DATE,
-        vencimiento DATE
-      )`);
-
-        db.run(`CREATE TABLE IF NOT EXISTS movimientos (
-        MovimientoID INTEGER PRIMARY KEY AUTOINCREMENT,
-        ProductoID INTEGER,
-        Tipo TEXT NOT NULL, -- 'Entrada' o 'Salida'
-        Cantidad INTEGER NOT NULL,
-        Fecha TEXT DEFAULT (datetime('now', 'localtime')),
-        FOREIGN KEY (ProductoID) REFERENCES productos(ProductoID)
-      )`);
-
-      // Asegurar que exista un admin inicial para login
-      db.get("SELECT count(*) as count FROM usuarios", (err, row) => {
-        if (err) {
-          console.error("Error checking users count:", err.message);
-          return;
-        }
-        if (!row || row.count === 0) {
-          const bcrypt = require("bcrypt");
-          bcrypt.hash("admin123", 10, (hashErr, hashedPassword) => {
-            if (hashErr) {
-              console.error("Error hashing admin password:", hashErr);
-              return;
-            }
-            db.run(
-              "INSERT OR IGNORE INTO usuarios (nombre, email, Rol, password) VALUES (?, ?, ?, ?)",
-              ["Administrador", "admin@bodega.com", "Admin", hashedPassword],
-              function (insertErr) {
-                if (insertErr) {
-                  console.error("Error inserting admin user:", insertErr.message);
-                  return;
-                }
-                console.log("Usuario admin por defecto creado (admin@bodega.com/admin123)");
-              }
-            );
-          });
-        }
-      });
-      });
+      console.error("Error creando tabla usuarios:", err);
+      process.exit(1);
     }
-  }
-);
 
-// Nota: En SQLite, se usa db.all() para obtener múltiples filas, db.get() para una sola fila, y db.run() para INSERT/UPDATE/DELETE.
+    pool.query(`CREATE TABLE IF NOT EXISTS productos (
+      ProductoID INT PRIMARY KEY AUTO_INCREMENT,
+      nombre VARCHAR(255) NOT NULL,
+      categoria VARCHAR(255),
+      cantidad INT DEFAULT 0,
+      ubicacion VARCHAR(255),
+      ingreso DATE,
+      vencimiento DATE
+    )`, (err) => {
+      if (err) {
+        console.error("Error creando tabla productos:", err);
+        process.exit(1);
+      }
+
+      pool.query(`CREATE TABLE IF NOT EXISTS movimientos (
+        MovimientoID INT PRIMARY KEY AUTO_INCREMENT,
+        ProductoID INT,
+        Tipo VARCHAR(50) NOT NULL,
+        Cantidad INT NOT NULL,
+        Fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ProductoID) REFERENCES productos(ProductoID)
+      )`, (err) => {
+        if (err) {
+          console.error("Error creando tabla movimientos:", err);
+          process.exit(1);
+        }
+
+        // 2. Asegurar que exista un admin inicial para login
+        pool.query("SELECT count(*) as count FROM usuarios WHERE email = 'admin@bodega.com'", (err, results) => {
+          if (err) {
+            console.error("Error checking users count:", err);
+            if (callback) callback();
+            return;
+          }
+          if (Number(results[0].count) === 0) {
+            console.log("Creando usuario admin por defecto...");
+            bcrypt.hash("admin123", 10, (hashErr, hashedPassword) => {
+              if (hashErr) {
+                console.error("Error hashing admin password:", hashErr);
+                return;
+              }
+              pool.query(
+                "INSERT INTO usuarios (nombre, email, Rol, password) VALUES (?, ?, ?, ?)",
+                ["Administrador", "admin@bodega.com", "Admin", hashedPassword],
+                (insertErr) => {
+                  if (insertErr) {
+                    console.error("Error inserting admin user:", insertErr);
+                  } else {
+                    console.log("Usuario admin por defecto creado (admin@bodega.com/admin123)");
+                  }
+                  if (callback) callback();
+                }
+              );
+            });
+          } else {
+            if (callback) callback();
+          }
+        });
+      });
+    });
+  });
+}
+
+function startServer() {
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+}
+
+function connectAndStart() {
+  console.log(`Intentando conectar a MySQL en ${dbHost}:${dbPort}...`);
+  pool.getConnection((err, connection) => {
+    if (err) {
+      // Si el error es que la DB no existe (común en entorno local), intentamos crearla
+      if (err.code === 'ER_BAD_DB_ERROR') {
+        console.log("La base de datos no existe. Intentando crearla (solo entorno local)...");
+        const tempConn = mysql.createConnection({
+          host: dbHost,
+          port: dbPort,
+          user: dbUser,
+          password: dbPassword
+        });
+
+        tempConn.query(`CREATE DATABASE IF NOT EXISTS ${mysql.escapeId(dbName)}`, (createErr) => {
+          tempConn.end();
+          if (createErr) {
+            console.error("Error fatal: No se pudo crear ni conectar a la DB:", createErr.message);
+            process.exit(1);
+          }
+          console.log("Base de datos creada. Inicializando...");
+          initDatabase(startServer);
+        });
+        return;
+      }
+      console.error("Error de conexión a MySQL:", err.message);
+      process.exit(1);
+    }
+    connection.release();
+    console.log("Conexión a MySQL establecida correctamente.");
+    initDatabase(startServer);
+  });
+}
 
 // ----------------------------------------------------------------------
 // AUTENTICACIÓN
@@ -113,27 +178,37 @@ app.post("/api/login", async (req, res) => {
     return res.status(400).json({ message: "Email y contraseña son requeridos" });
   }
 
-  db.get(
+  pool.query(
     "SELECT UsuarioID, nombre, email, Rol, password FROM usuarios WHERE email = ?",
     [email],
-    async (err, user) => {
+    async (err, results) => {
       if (err) {
-        console.error("Error querying user:", err.message);
+        console.error("Error querying user:", err);
         return res.status(500).json({ message: "Error interno del servidor" });
       }
+      const user = results[0];
       if (!user) {
-        return res.status(401).json({ message: "Credenciales incorrectas" });
+        console.log(`Intento de login fallido: usuario no encontrado (${email})`);
+        return res.status(401).json({ message: "Usuario no registrado o credenciales incorrectas" });
       }
+
+      // Detectar el rol de forma segura y normalizada
+      const userRole = (user.Rol || user.rol || "").trim();
+      
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
+        console.log(`Intento de login fallido: contraseña incorrecta para ${email}`);
         return res.status(401).json({ message: "Credenciales incorrectas" });
       }
+
+      console.log(`Login exitoso para ${email}. Rol detectado: "${userRole}"`);
+
       const token = jwt.sign(
-        { userId: user.UsuarioID, email: user.email, role: user.Rol },
+        { userId: user.UsuarioID, email: user.email, role: userRole },
         JWT_SECRET,
         { expiresIn: "24h" }
       );
-      res.json({ token, user: { id: user.UsuarioID, nombre: user.nombre, email: user.email, rol: user.Rol } });
+      res.json({ token, user: { id: user.UsuarioID, nombre: user.nombre, email: user.email, rol: userRole } });
     }
   );
 });
@@ -163,14 +238,19 @@ function authenticateToken(req, res, next) {
   try {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
-  } catch (e) {
+  } catch (err) {
+    console.error("Error al verificar token:", err.message);
     res.status(401).json({ message: "Token inválido" });
   }
 }
 
 // Middleware para verificar rol de administrador
 function requireAdmin(req, res, next) {
-  if (req.user.role !== "Admin") {
+  const role = (req.user && (req.user.role || req.user.rol || "")).toString().trim();
+  
+  console.log(`Verificando permisos de Admin. Rol en token: "${role}"`);
+
+  if (role.toLowerCase() !== "admin") {
     return res.status(403).json({ error: "Acceso denegado. Solo administradores pueden realizar esta acción." });
   }
   next();
@@ -181,13 +261,12 @@ function requireAdmin(req, res, next) {
 // ----------------------------------------------------------------------
 
 // GET todos los Usuarios
-app.get("/api/usuarios", (req, res) => {
-  // SQLite no necesita el alias 'AS' para UsuarioID.
-  db.all(
+app.get("/api/usuarios", authenticateToken, requireAdmin, (req, res) => {
+  pool.query(
     "SELECT UsuarioID, nombre, email, Rol FROM usuarios",
     (err, results) => {
       if (err) {
-        console.error("Error querying usuarios:", err.message);
+        console.error("Error querying usuarios:", err);
         return res.status(500).json({ error: "Error al obtener los usuarios" });
       }
       res.json(results);
@@ -197,22 +276,28 @@ app.get("/api/usuarios", (req, res) => {
 
 // POST Nuevo Usuario
 app.post("/api/usuarios", async (req, res) => {
-  const { nombre, email, Rol, password } = req.body;
+  let { nombre, email, Rol, rol, password } = req.body;
 
-  if (!nombre || !email || !Rol || !password) {
+  // Soporte para ambos nombres de campo 'Rol' y 'rol' desde el frontend
+  let roleToSave = Rol || rol;
+
+  if (!nombre || !email || !roleToSave || !password) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
+
+  // Normalizar Rol para asegurar consistencia (Admin, Bodeguero, Visor)
+  roleToSave = roleToSave.toString().trim();
+  roleToSave = roleToSave.charAt(0).toUpperCase() + roleToSave.slice(1).toLowerCase();
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const sql =
       "INSERT INTO usuarios (nombre, email, Rol, password) VALUES (?, ?, ?, ?)";
-    const params = [nombre, email, Rol, hashedPassword];
+    const params = [nombre, email, roleToSave, hashedPassword];
 
-    // db.run ejecuta la query y usa `this.lastID` para el ID insertado
-    db.run(sql, params, function (err) {
+    pool.query(sql, params, (err, result) => {
       if (err) {
-        console.error("Error inserting usuario:", err.message);
+        console.error("Error inserting usuario:", err);
         // Error 500 podría indicar una violación de UNIQUE (email)
         return res
           .status(500)
@@ -220,7 +305,7 @@ app.post("/api/usuarios", async (req, res) => {
       }
       res.json({
         message: "Usuario creado correctamente",
-        id: this.lastID, // SQLite property for the last inserted row ID
+        id: result.insertId,
       });
     });
   } catch (error) {
@@ -231,15 +316,15 @@ app.post("/api/usuarios", async (req, res) => {
 // GET Usuario
 app.get("/api/usuarios/:id", (req, res) => {
   const { id } = req.params;
-  // db.get es para obtener una sola fila
-  db.get(
+  pool.query(
     "SELECT UsuarioID, nombre, email, Rol FROM usuarios WHERE UsuarioID = ?",
     [id],
-    (err, result) => {
+    (err, results) => {
       if (err) {
-        console.error("Error querying usuario:", err.message);
+        console.error("Error querying usuario:", err);
         return res.status(500).json({ error: "Error al obtener el usuario" });
       }
+      const result = results[0];
       if (!result) {
         return res.status(404).json({ error: "Usuario no encontrado" });
       }
@@ -253,6 +338,13 @@ app.put("/api/usuarios/:id", async (req, res) => {
   const { id } = req.params;
   let userData = req.body;
 
+  // Mapear 'rol' a 'Rol' si es necesario para consistencia con la DB
+  const inputRol = userData.Rol || userData.rol;
+  if (inputRol) {
+    userData.Rol = inputRol;
+    if (userData.rol) delete userData.rol;
+  }
+
   // Si se proporciona una nueva contraseña, se hashea
   if (userData.password) {
     try {
@@ -262,6 +354,12 @@ app.put("/api/usuarios/:id", async (req, res) => {
         .status(500)
         .json({ error: "Error al encriptar la contraseña" });
     }
+  }
+
+  // Normalizar Rol si se proporciona para mantener la consistencia visual y de permisos
+  if (userData.Rol) {
+    userData.Rol = userData.Rol.toString().trim();
+    userData.Rol = userData.Rol.charAt(0).toUpperCase() + userData.Rol.slice(1).toLowerCase();
   }
 
   // Convertir el objeto userData a una lista de SET clauses y sus valores
@@ -276,13 +374,12 @@ app.put("/api/usuarios/:id", async (req, res) => {
 
   const sql = `UPDATE usuarios SET ${setClauses} WHERE UsuarioID = ?`;
 
-  // db.run ejecuta la query y usa `this.changes` para ver filas afectadas
-  db.run(sql, params, function (err) {
+  pool.query(sql, params, (err, result) => {
     if (err) {
-      console.error("Error updating usuario:", err.message);
+      console.error("Error updating usuario:", err);
       return res.status(500).json({ error: "Error al actualizar el usuario" });
     }
-    if (this.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
     res.json({ message: "Usuario actualizado correctamente" });
@@ -292,12 +389,12 @@ app.put("/api/usuarios/:id", async (req, res) => {
 // DELETE Usuario
 app.delete("/api/usuarios/:id", (req, res) => {
   const { id } = req.params;
-  db.run("DELETE FROM usuarios WHERE UsuarioID = ?", [id], function (err) {
+  pool.query("DELETE FROM usuarios WHERE UsuarioID = ?", [id], (err, result) => {
     if (err) {
-      console.error("Error deleting usuario:", err.message);
+      console.error("Error deleting usuario:", err);
       return res.status(500).json({ error: "Error al eliminar el usuario" });
     }
-    if (this.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
     res.json({ message: "Usuario eliminado correctamente" });
@@ -310,9 +407,9 @@ app.delete("/api/usuarios/:id", (req, res) => {
 
 // Obtener Productos
 app.get("/api/productos", (req, res) => {
-  db.all("SELECT * FROM productos", (err, results) => {
+  pool.query("SELECT * FROM productos", (err, results) => {
     if (err) {
-      console.error("Error querying productos:", err.message);
+      console.error("Error querying productos:", err);
       return res.status(500).json({ error: "Error al obtener los productos" });
     }
     res.json(results);
@@ -324,20 +421,17 @@ app.get("/api/productos", (req, res) => {
 // para evitar que Express trate `vencimiento` como un `:id` y se produzcan colisiones.
 app.get("/api/productos/vencimiento", (req, res) => {
   const DIAS_PARA_VENCER_UMBRAL = 30;
-  // SQLite usa julianday() para operaciones con fechas
   const query = `
     SELECT ProductoID, nombre, categoria, cantidad, vencimiento
     FROM productos
-    WHERE strftime('%s', vencimiento)
-    BETWEEN strftime('%s', 'now', 'localtime')
-    AND strftime('%s', 'now', 'localtime', '+${DIAS_PARA_VENCER_UMBRAL} days')
+    WHERE vencimiento BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), INTERVAL ${DIAS_PARA_VENCER_UMBRAL} DAY)
     AND cantidad > 0
     ORDER BY vencimiento ASC
   `;
 
-  db.all(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
-      console.error("Error querying productos por vencer:", err.message);
+      console.error("Error querying productos por vencer:", err);
       return res
         .status(500)
         .json({ error: "Error al obtener los productos por vencer" });
@@ -349,14 +443,15 @@ app.get("/api/productos/vencimiento", (req, res) => {
 // Obtener un Producto
 app.get("/api/productos/:id", (req, res) => {
   const { id } = req.params;
-  db.get(
+  pool.query(
     "SELECT * FROM productos WHERE ProductoID = ?",
     [id],
-    (err, result) => {
+    (err, results) => {
       if (err) {
-        console.error("Error querying producto:", err.message);
+        console.error("Error querying producto:", err);
         return res.status(500).json({ error: "Error al obtener el producto" });
       }
+      const result = results[0];
       if (!result) {
         return res.status(404).json({ error: "Producto no encontrado" });
       }
@@ -375,14 +470,14 @@ app.post("/api/productos", authenticateToken, requireAdmin, (req, res) => {
   )}) VALUES (${placeholders})`;
   const params = keys.map((key) => nuevoProducto[key]);
 
-  db.run(sql, params, function (err) {
+  pool.query(sql, params, (err, result) => {
     if (err) {
-      console.error("Error inserting producto:", err.message);
+      console.error("Error inserting producto:", err);
       return res.status(500).json({ error: "Error al agregar el producto" });
     }
     res.json({
       message: "Producto agregado correctamente",
-      id: this.lastID,
+      id: result.insertId,
     });
   });
 });
@@ -404,12 +499,12 @@ app.put("/api/productos/:id", authenticateToken, requireAdmin, (req, res) => {
 
   const sql = `UPDATE productos SET ${setClauses} WHERE ProductoID = ?`;
 
-  db.run(sql, params, function (err) {
+  pool.query(sql, params, (err, result) => {
     if (err) {
-      console.error("Error updating producto:", err.message);
+      console.error("Error updating producto:", err);
       return res.status(500).json({ error: "Error al actualizar el producto" });
     }
-    if (this.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
     res.json({ message: "Producto actualizado correctamente" });
@@ -419,12 +514,12 @@ app.put("/api/productos/:id", authenticateToken, requireAdmin, (req, res) => {
 // Borrar Producto
 app.delete("/api/productos/:id", authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
-  db.run("DELETE FROM productos WHERE ProductoID = ?", [id], function (err) {
+  pool.query("DELETE FROM productos WHERE ProductoID = ?", [id], (err, result) => {
     if (err) {
-      console.error("Error deleting producto:", err.message);
+      console.error("Error deleting producto:", err);
       return res.status(500).json({ error: "Error al eliminar el producto" });
     }
-    if (this.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
     res.json({ message: "Producto eliminado correctamente" });
@@ -452,64 +547,82 @@ app.post("/api/entradas", authenticateToken, requireAdmin, (req, res) => {
       .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  // Usar transacción para asegurar atomicidad
-  db.serialize(() => {
-    db.run("BEGIN TRANSACTION");
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error("Error obteniendo conexión MySQL:", err);
+      return res.status(500).json({ error: "Error de conexión." });
+    }
 
-    // 1. Actualizar stock
-    db.run(
-      "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
-      [cantidad, nombreProductoEntrada],
-      function (err) {
-        if (err) {
-          console.error("Error updating stock:", err.message);
-          db.run("ROLLBACK");
-          return res
-            .status(500)
-            .json({ error: "Error al actualizar el stock del producto." });
-        }
-        if (this.changes === 0) {
-          db.run("ROLLBACK");
-          return res.status(404).json({ error: "Producto no encontrado." });
-        }
+    connection.beginTransaction((err) => {
+      if (err) {
+        connection.release();
+        console.error("Error iniciando transacción:", err);
+        return res.status(500).json({ error: "Error iniciando transacción." });
+      }
 
-        // 2. Registrar movimiento
-        const movimiento = {
-          ProductoID: nombreProductoEntrada,
-          Tipo: "Entrada",
-          Cantidad: cantidad,
-        };
-
-        const sqlMov =
-          "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
-        const paramsMov = [
-          movimiento.ProductoID,
-          movimiento.Tipo,
-          movimiento.Cantidad,
-        ];
-
-        db.run(sqlMov, paramsMov, function (err) {
+      connection.query(
+        "SELECT cantidad FROM productos WHERE ProductoID = ?",
+        [nombreProductoEntrada],
+        (err, results) => {
           if (err) {
-            console.error("Error logging movement:", err.message);
-            db.run("ROLLBACK");
-            return res
-              .status(500)
-              .json({ error: "Error al registrar el movimiento." });
+            return connection.rollback(() => {
+              connection.release();
+              console.error("Error verificando producto:", err);
+              res.status(500).json({ error: "Error verificando stock." });
+            });
           }
 
-          // Confirmar transacción
-          db.run("COMMIT", (err) => {
-            if (err) {
-              console.error("Error committing transaction:", err.message);
-              return res
-                .status(500)
-                .json({ error: "Error al confirmar la transacción." });
+          const product = results[0];
+          if (!product) {
+            return connection.rollback(() => {
+              connection.release();
+              res.status(404).json({ error: "Producto no encontrado." });
+            });
+          }
+
+          connection.query(
+            "UPDATE productos SET cantidad = cantidad + ? WHERE ProductoID = ?",
+            [cantidad, nombreProductoEntrada],
+            (err) => {
+              if (err) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error("Error actualizando stock:", err);
+                  res.status(500).json({ error: "Error al actualizar el stock." });
+                });
+              }
+
+              connection.query(
+                "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)",
+                [nombreProductoEntrada, "Entrada", cantidad],
+                (err) => {
+                  if (err) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      console.error("Error registrando movimiento:", err);
+                      res.status(500).json({ error: "Error al registrar el movimiento." });
+                    });
+                  }
+
+                  connection.commit((err) => {
+                    if (err) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        console.error("Error confirmando transacción:", err);
+                        res.status(500).json({ error: "Error al confirmar la transacción." });
+                      });
+                    }
+
+                    connection.release();
+                    res.json({ message: "Entrada de stock registrada correctamente." });
+                  });
+                }
+              );
             }
-            res.json({ message: "Entrada de stock registrada correctamente." });
-          });
-        });
-      }
-    );
+          );
+        }
+      );
+    });
   });
 });
 
@@ -530,86 +643,68 @@ app.post("/api/salidas", authenticateToken, requireAdmin, (req, res) => {
       .json({ error: "La cantidad debe ser un número positivo." });
   }
 
-  // Usar transacción para asegurar atomicidad
-  db.serialize(() => {
-    db.run("BEGIN TRANSACTION");
+  pool.getConnection((err, connection) => {
+    if (err) return res.status(500).json({ error: "Error de conexión." });
 
-    // 1. Verificar stock
-    db.get(
-      "SELECT cantidad FROM productos WHERE ProductoID = ?",
-      [nombreProductoSalida],
-      (err, result) => {
-        if (err) {
-          console.error("Error checking stock:", err.message);
-          db.run("ROLLBACK");
-          return res.status(500).json({ error: "Error al verificar el stock." });
-        }
+    connection.beginTransaction((err) => {
+      if (err) { connection.release(); return res.status(500).json({ error: "Error iniciando transacción." }); }
 
-        if (!result) {
-          db.run("ROLLBACK");
-          return res.status(404).json({ error: "Producto no encontrado." });
-        }
-
-        const stockActual = result.cantidad;
-        if (stockActual < cantidad) {
-          db.run("ROLLBACK");
-          return res.status(400).json({
-            error: `Stock insuficiente. Solo quedan ${stockActual} unidades.`,
-          });
-        }
-
-        // 2. Actualizar stock
-        db.run(
-          "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
-          [cantidad, nombreProductoSalida],
-          function (updateErr) {
-            if (updateErr) {
-              console.error("Error updating stock:", updateErr.message);
-              db.run("ROLLBACK");
-              return res
-                .status(500)
-                .json({ error: "Error al actualizar el stock del producto." });
-            }
-
-            // 3. Registrar movimiento
-            const movimiento = {
-              ProductoID: nombreProductoSalida,
-              Tipo: "Salida",
-              Cantidad: cantidad,
-            };
-
-            const sqlMov =
-              "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)";
-            const paramsMov = [
-              movimiento.ProductoID,
-              movimiento.Tipo,
-              movimiento.Cantidad,
-            ];
-
-            db.run(sqlMov, paramsMov, function (logErr) {
-              if (logErr) {
-                console.error("Error logging movement:", logErr.message);
-                db.run("ROLLBACK");
-                return res
-                  .status(500)
-                  .json({ error: "Error al registrar el movimiento." });
-              }
-
-              // Confirmar transacción
-              db.run("COMMIT", (err) => {
-                if (err) {
-                  console.error("Error committing transaction:", err.message);
-                  return res
-                    .status(500)
-                    .json({ error: "Error al confirmar la transacción." });
-                }
-                res.json({ message: "Salida de stock registrada correctamente." });
+      // 1. Verificar stock
+      connection.query(
+        "SELECT cantidad FROM productos WHERE ProductoID = ?",
+        [nombreProductoSalida],
+        (err, results) => {
+          const result = results ? results[0] : null;
+          if (err || !result || result.cantidad < cantidad) {
+            return connection.rollback(() => {
+              connection.release();
+              res.status(err ? 500 : (result ? 400 : 404)).json({ 
+                error: err ? "Error verificando stock." : (result ? `Stock insuficiente. Solo quedan ${result.cantidad} unidades.` : "Producto no encontrado.") 
               });
             });
           }
-        );
-      }
-    );
+
+          // 2. Actualizar stock
+          connection.query(
+            "UPDATE productos SET cantidad = cantidad - ? WHERE ProductoID = ?",
+            [cantidad, nombreProductoSalida],
+            (err) => {
+              if (err) {
+                return connection.rollback(() => {
+                  connection.release();
+                  res.status(500).json({ error: "Error actualizando stock." });
+                });
+              }
+
+              // 3. Registrar movimiento
+              connection.query(
+                "INSERT INTO movimientos (ProductoID, Tipo, Cantidad) VALUES (?, ?, ?)",
+                [nombreProductoSalida, "Salida", cantidad],
+                (err) => {
+                  if (err) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      res.status(500).json({ error: "Error al registrar el movimiento." });
+                    });
+                  }
+
+                  connection.commit((err) => {
+                    if (err) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).json({ error: "Error al confirmar transacción." });
+                      });
+                    }
+                    connection.release();
+                    res.json({ message: "Salida de stock registrada correctamente." });
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    });
   });
 });
 
@@ -622,10 +717,9 @@ app.get("/api/movimientos", (req, res) => {
     ORDER BY m.Fecha DESC
     LIMIT 5;
   `;
-  // db.all es para obtener múltiples resultados
-  db.all(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
-      console.error("Error querying movimientos:", err.message);
+      console.error("Error querying movimientos:", err);
       return res
         .status(500)
         .json({ error: "Error al obtener los movimientos" });
@@ -646,16 +740,7 @@ app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res) => {
 // Serve the main HTML file
 
 app.get("/", (req, res) => {
-  // Verificar si hay un token válido en las cookies o headers
-  const authHeader = req.headers.authorization || req.headers.cookie;
-
-  if (authHeader && (authHeader.includes('authToken=') || authHeader.startsWith('Bearer '))) {
-    // Si hay token, servir el dashboard
-    res.sendFile(path.join(__dirname, "src", "index.html"));
-  } else {
-    // Si no hay token, redirigir al login
-    res.redirect('/login.html');
-  }
+  res.redirect('/login');
 });
 
 // Routes for other HTML pages
@@ -687,7 +772,5 @@ app.get("/salida", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "salida.html"));
 });
 
-// Iniciar Servidor
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+// Iniciar Servidor solo después de validar conexión MySQL
+connectAndStart();

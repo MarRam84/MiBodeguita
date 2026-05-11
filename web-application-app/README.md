@@ -72,7 +72,47 @@ To set up and run the web application, follow these steps:
    - You'll be redirected to the login page
    - Use the test credentials above to log in
 
-## 🔧 Development
+## � Despliegue en Fly.io (Hosting Gratis)
+
+Este proyecto está configurado para desplegarse fácilmente en Fly.io, que ofrece hosting gratis con persistencia para la base de datos SQLite.
+
+### Pasos para Desplegar:
+
+1. **Instala Fly CLI**:
+   ```bash
+   # En Windows (PowerShell)
+   iwr https://fly.io/install.ps1 -useb | iex
+   ```
+
+2. **Inicia sesión en Fly.io**:
+   ```bash
+   fly auth login
+   ```
+
+3. **Lanza la app**:
+   ```bash
+   fly launch
+   ```
+   - Elige un nombre único para tu app.
+   - Selecciona la región más cercana (ej. "iad" para US East).
+
+4. **Despliega**:
+   ```bash
+   fly deploy
+   ```
+
+5. **Accede a tu app**:
+   ```bash
+   fly open
+   ```
+   Esto abrirá tu app en el navegador.
+
+### Notas:
+- La base de datos SQLite se guarda en un volumen persistente para no perder datos entre despliegues.
+- El plan gratis incluye 3 GB RAM y 1 GB almacenamiento.
+- Si necesitas escalar, Fly.io ofrece planes pagos.
+
+## �🔧 Development
 
 - **Development mode**: `npm run dev` (with nodemon)
 - **Build for production**: `npm run build`

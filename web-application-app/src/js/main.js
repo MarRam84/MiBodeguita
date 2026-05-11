@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // IMPORTANTE: Reemplaza la siguiente dirección con la IP de la computadora donde corre el servidor.
-  const API_BASE_URL = "http://localhost:3000/api";
+  // Configuración dinámica de la URL de la API
+  const API_BASE_URL = window.location.origin + "/api";
 
   // --- AUTENTICACIÓN --- //
   const token = localStorage.getItem("authToken");
@@ -157,39 +157,43 @@ document.addEventListener("DOMContentLoaded", () => {
       const categorias = new Set();
 
       productos.forEach((p) => {
-        const categoria = (p.categoria || "").trim();
-        if (categoria) categorias.add(categoria);
+        let categoria = (p.categoria || "").trim();
+        if (categoria) {
+          // Normalizar para evitar duplicados como "Alimentos" y "alimentos"
+          categorias.add(categoria.charAt(0).toUpperCase() + categoria.slice(1).toLowerCase());
+        }
       });
 
       const defaultCategorias = [
         "alimentos",
         "bebidas",
         "limpieza",
-        "electronica",
-        "Herramientas",
-        "Ropa",
-        "Juguetes",
-        "Hogar",
-        "Muebles",
-        "Deportes",
+        "electrónica",
+        "herramientas",
+        "ropa",
+        "juguetes",
+        "hogar",
+        "muebles",
+        "deportes",
         "Salud",
         "Mascotas",
         "Calzado",
         "otros",
       ];
 
-      defaultCategorias.forEach((cat) => categorias.add(cat));
+      defaultCategorias.forEach((cat) => {
+        const normalized = cat.trim();
+        categorias.add(normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase());
+      });
 
-      return Array.from(categorias).sort((a, b) =>
-        a.toLowerCase().localeCompare(b.toLowerCase(), "es", { sensitivity: "base" })
-      );
+      return Array.from(categorias).sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
     } catch (error) {
       console.error("Error cargando categorías:", error);
       return [
-        "alimentos",
-        "bebidas",
-        "limpieza",
-        "electronica",
+        "Alimentos",
+        "Bebidas",
+        "Limpieza",
+        "Electrónica",
         "Herramientas",
         "Ropa",
         "Juguetes",
@@ -199,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Salud",
         "Mascotas",
         "Calzado",
-        "otros",
+        "Otros",
       ];
     }
   }
@@ -694,7 +698,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       fetch(`${API_BASE_URL}/entradas`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(data),
       })
         .then((response) =>
@@ -742,7 +749,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       fetch(`${API_BASE_URL}/salidas`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(data),
       })
         .then((response) =>
@@ -1016,7 +1026,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(`${API_BASE_URL}/productos`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(nuevoProducto),
         });
         const result = await response.json();
@@ -1043,7 +1056,10 @@ document.addEventListener("DOMContentLoaded", () => {
           `${API_BASE_URL}/productos/${productoId}`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify(updatedProducto),
           }
         );
@@ -1112,6 +1128,9 @@ document.addEventListener("DOMContentLoaded", () => {
           `${API_BASE_URL}/productos/${productoId}`,
           {
             method: "DELETE",
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
           }
         );
         const result = await response.json();
