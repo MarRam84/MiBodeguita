@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // IMPORTANTE: Reemplaza la siguiente dirección con la IP de la computadora donde corre el servidor.
-  const API_BASE_URL = "http://10.68.141.12:3000/api";
+  const API_BASE_URL = "http://localhost:3000/api";
 
   // --- AUTENTICACIÓN --- //
   const token = localStorage.getItem("authToken");

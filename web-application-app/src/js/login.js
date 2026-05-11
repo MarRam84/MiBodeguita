@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Configuración
   // Forzamos la URL de API al servidor local (asegura que funcione aunque se abra desde file://)
-  const API_BASE_URL = "http://10.68.141.12:3000/api";
+  const API_BASE_URL = "http://localhost:3000/api";
 
   // Elementos del DOM
   const loginForm = document.getElementById("loginForm");

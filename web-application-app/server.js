@@ -168,6 +168,14 @@ function authenticateToken(req, res, next) {
   }
 }
 
+// Middleware para verificar rol de administrador
+function requireAdmin(req, res, next) {
+  if (req.user.role !== "Admin") {
+    return res.status(403).json({ error: "Acceso denegado. Solo administradores pueden realizar esta acción." });
+  }
+  next();
+}
+
 // ----------------------------------------------------------------------
 // API routes for usuarios
 // ----------------------------------------------------------------------
@@ -358,7 +366,7 @@ app.get("/api/productos/:id", (req, res) => {
 });
 
 // POST Nuevo Producto
-app.post("/api/productos", (req, res) => {
+app.post("/api/productos", authenticateToken, requireAdmin, (req, res) => {
   const nuevoProducto = req.body;
   const keys = Object.keys(nuevoProducto);
   const placeholders = keys.map(() => "?").join(", ");
@@ -380,12 +388,7 @@ app.post("/api/productos", (req, res) => {
 });
 
 // PUT Actualizar Producto
-app.put("/api/productos/:id", authenticateToken, (req, res) => {
-  // solo usuarios que no sean bodeguero o visor pueden editar
-  const forbiddenRoles = ["Bodeguero", "Visor"];
-  if (forbiddenRoles.includes(req.user.role)) {
-    return res.status(403).json({ error: "No autorizado para actualizar productos" });
-  }
+app.put("/api/productos/:id", authenticateToken, requireAdmin, (req, res) => {
 
   const { id } = req.params;
   const updatedProducto = req.body;
@@ -414,7 +417,7 @@ app.put("/api/productos/:id", authenticateToken, (req, res) => {
 });
 
 // Borrar Producto
-app.delete("/api/productos/:id", (req, res) => {
+app.delete("/api/productos/:id", authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
   db.run("DELETE FROM productos WHERE ProductoID = ?", [id], function (err) {
     if (err) {
@@ -433,7 +436,7 @@ app.delete("/api/productos/:id", (req, res) => {
 // ----------------------------------------------------------------------
 
 // POST Entrada
-app.post("/api/entradas", (req, res) => {
+app.post("/api/entradas", authenticateToken, requireAdmin, (req, res) => {
   const { nombreProductoEntrada, cantidadProductoEntrada } = req.body;
 
   if (!nombreProductoEntrada || !cantidadProductoEntrada) {
@@ -511,7 +514,7 @@ app.post("/api/entradas", (req, res) => {
 });
 
 // POST Salida
-app.post("/api/salidas", (req, res) => {
+app.post("/api/salidas", authenticateToken, requireAdmin, (req, res) => {
   const { nombreProductoSalida, cantidadProductoSalida } = req.body;
 
   if (!nombreProductoSalida || !cantidadProductoSalida) {
