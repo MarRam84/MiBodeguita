@@ -14,6 +14,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_super_segura";
 app.use(cors());
 app.use(express.json());
 
+// Servir archivos estáticos desde la carpeta 'src'
+app.use(express.static(path.join(__dirname, "src")));
+
 // Rutas específicas antes de archivos estáticos
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "login.html"));
@@ -22,8 +25,6 @@ app.get("/login", (req, res) => {
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "index.html"));
 });
-
-app.use(express.static(path.join(__dirname, "src")));
 
 // Conexión a la base de datos MySQL
 const dbHost = process.env.DB_HOST?.trim() || "localhost";
@@ -204,11 +205,11 @@ app.post("/api/login", async (req, res) => {
       console.log(`Login exitoso para ${email}. Rol detectado: "${userRole}"`);
 
       const token = jwt.sign(
-        { userId: user.UsuarioID, email: user.email, role: userRole },
+        { userId: user.UsuarioID, email: user.email, rol: userRole, role: userRole },
         JWT_SECRET,
         { expiresIn: "24h" }
       );
-      res.json({ token, user: { id: user.UsuarioID, nombre: user.nombre, email: user.email, rol: userRole } });
+      res.json({ token, user: { id: user.UsuarioID, nombre: user.nombre, email: user.email, rol: userRole, role: userRole } });
     }
   );
 });
@@ -237,6 +238,11 @@ function authenticateToken(req, res, next) {
   const token = authHeader.substring(7);
   try {
     req.user = jwt.verify(token, JWT_SECRET);
+    
+    // Log para reconocer quién accede a qué dirección
+    const currentRole = (req.user.rol || req.user.role || "Invitado").toUpperCase();
+    console.log(`Acceso: [${currentRole}] ${req.user.email} -> ${req.method} ${req.originalUrl}`);
+    
     next();
   } catch (err) {
     console.error("Error al verificar token:", err.message);
@@ -246,12 +252,17 @@ function authenticateToken(req, res, next) {
 
 // Middleware para verificar rol de administrador
 function requireAdmin(req, res, next) {
-  const role = (req.user && (req.user.role || req.user.rol || "")).toString().trim();
-  
-  console.log(`Verificando permisos de Admin. Rol en token: "${role}"`);
+  if (!req.user) {
+    return res.status(401).json({ error: "No autenticado. Por favor, inicia sesión." });
+  }
 
-  if (role.toLowerCase() !== "admin") {
-    return res.status(403).json({ error: "Acceso denegado. Solo administradores pueden realizar esta acción." });
+  const role = (req.user.rol || req.user.role || "").toString().trim().toLowerCase();
+
+  if (role !== "admin") {
+    console.warn(`[BLOQUEO] Intento de acceso a zona de Admin denegado. Usuario: ${req.user.email} | Rol: "${role}"`);
+    return res.status(403).json({ 
+      error: `Acceso denegado. El rol "${role.toUpperCase()}" no tiene permisos para usar esta dirección de administrador.` 
+    });
   }
   next();
 }
@@ -275,7 +286,7 @@ app.get("/api/usuarios", authenticateToken, requireAdmin, (req, res) => {
 });
 
 // POST Nuevo Usuario
-app.post("/api/usuarios", async (req, res) => {
+app.post("/api/usuarios", authenticateToken, requireAdmin, async (req, res) => {
   let { nombre, email, Rol, rol, password } = req.body;
 
   // Soporte para ambos nombres de campo 'Rol' y 'rol' desde el frontend
@@ -314,7 +325,7 @@ app.post("/api/usuarios", async (req, res) => {
 });
 
 // GET Usuario
-app.get("/api/usuarios/:id", (req, res) => {
+app.get("/api/usuarios/:id", authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
   pool.query(
     "SELECT UsuarioID, nombre, email, Rol FROM usuarios WHERE UsuarioID = ?",
@@ -334,7 +345,7 @@ app.get("/api/usuarios/:id", (req, res) => {
 });
 
 // PUT Actualizar Usuario
-app.put("/api/usuarios/:id", async (req, res) => {
+app.put("/api/usuarios/:id", authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   let userData = req.body;
 
@@ -387,7 +398,7 @@ app.put("/api/usuarios/:id", async (req, res) => {
 });
 
 // DELETE Usuario
-app.delete("/api/usuarios/:id", (req, res) => {
+app.delete("/api/usuarios/:id", authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
   pool.query("DELETE FROM usuarios WHERE UsuarioID = ?", [id], (err, result) => {
     if (err) {
@@ -710,14 +721,40 @@ app.post("/api/salidas", authenticateToken, requireAdmin, (req, res) => {
 
 // GET Movimientos Recientes
 app.get("/api/movimientos", (req, res) => {
-  const query = `
+  const { tipo, inicio, fin } = req.query;
+  let sql = `
     SELECT m.Tipo, m.Cantidad, m.Fecha, p.nombre AS ProductoNombre
     FROM movimientos m
     JOIN productos p ON m.ProductoID = p.ProductoID
-    ORDER BY m.Fecha DESC
-    LIMIT 5;
   `;
-  pool.query(query, (err, results) => {
+  const params = [];
+  const conditions = [];
+
+  if (tipo) {
+    conditions.push("m.Tipo = ?");
+    params.push(tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase());
+  }
+  if (inicio) {
+    conditions.push("m.Fecha >= ?");
+    params.push(inicio + " 00:00:00");
+  }
+  if (fin) {
+    conditions.push("m.Fecha <= ?");
+    params.push(fin + " 23:59:59");
+  }
+
+  if (conditions.length > 0) {
+    sql += " WHERE " + conditions.join(" AND ");
+  }
+
+  sql += " ORDER BY m.Fecha DESC";
+
+  // Si no hay filtros (página principal), limitamos a 5
+  if (!tipo && !inicio && !fin) {
+    sql += " LIMIT 5";
+  }
+
+  pool.query(sql, params, (err, results) => {
     if (err) {
       console.error("Error querying movimientos:", err);
       return res

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function checkAuth() {
     if (!token) {
       // No hay token, redirigir al login
-      window.location.href = "login.html";
+      window.location.href = "/login";
       return false;
     }
 
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    window.location.href = "login.html";
+    window.location.href = "/login";
   }
 
   // Nota: Se eliminó el logout forzado en recarga de página para mantener sesión activa.
@@ -243,6 +243,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const productos = await productosRes.json();
       const movimientos = await movimientosRes.json();
 
+      if (!Array.isArray(productos) || !Array.isArray(movimientos)) {
+        console.error("Los datos recibidos no tienen el formato esperado.");
+        return;
+      }
+
+      const elTotal = document.getElementById("totalProductos");
+      const elStock = document.getElementById("stockCritico");
+      const elVence = document.getElementById("proximosAVencer");
+      const elMovsContenedor = document.getElementById("ultimosMovimientos");
+
       // Update dashboard cards
       const STOCK_CRITICO_UMBRAL = 10;
       const DIAS_PARA_VENCER_UMBRAL = 30;
@@ -261,14 +271,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const proximosAVencer = proximosAVencerArray.length;
 
-      document.getElementById("totalProductos").textContent = productos.length;
-      document.getElementById("stockCritico").textContent = stockCritico > 0 ? stockCriticoArray.map(p => p.nombre).join(', ') : '0';
-      document.getElementById("proximosAVencer").textContent = proximosAVencer > 0 ? proximosAVencerArray.map(p => p.nombre).join(', ') : '0';
+      if (elTotal) elTotal.textContent = productos.length;
+      if (elStock) elStock.textContent = stockCritico;
+      if (elVence) elVence.textContent = proximosAVencer;
 
       // Update movimientos
-      const contenedor = document.getElementById("ultimosMovimientos");
-      if (!movimientos || movimientos.length === 0) {
-        contenedor.innerHTML = "<p>No hay movimientos recientes.</p>";
+      if (!elMovsContenedor) return;
+
+      if (movimientos.length === 0) {
+        elMovsContenedor.innerHTML = "<p>No hay movimientos recientes.</p>";
         return;
       }
 
@@ -289,8 +300,8 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
         lista.appendChild(item);
       });
-      contenedor.innerHTML = "";
-      contenedor.appendChild(lista);
+      elMovsContenedor.innerHTML = "";
+      elMovsContenedor.appendChild(lista);
     } catch (error) {
       console.error("Error actualizando dashboard:", error);
     }
@@ -328,6 +339,9 @@ document.addEventListener("DOMContentLoaded", () => {
           case "salida":
             activarSalida();
             break;
+          case "configuracion":
+            activarConfiguracion();
+            break;
           case "reportes":
             loadScript("https://cdn.jsdelivr.net/npm/chart.js")
               .then(() => {
@@ -345,6 +359,27 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error al cargar la sección:", error);
         contentArea.innerHTML = "<p>Error al cargar la sección.</p>";
       });
+  }
+
+  // --- CONFIGURACION LOGIC --- //
+  function activarConfiguracion() {
+    const nombreConfig = document.getElementById("nombreConfig");
+    const emailConfig = document.getElementById("emailConfig");
+    const rolConfig = document.getElementById("rolConfig");
+    const btnChangePassword = document.getElementById("btnChangePassword");
+
+    // Poblar datos del usuario desde el localStorage
+    if (user) {
+      if (nombreConfig) nombreConfig.textContent = user.nombre;
+      if (emailConfig) emailConfig.textContent = user.email;
+      if (rolConfig) rolConfig.textContent = user.rol || user.role;
+    }
+
+    if (btnChangePassword) {
+      btnChangePassword.addEventListener("click", () => {
+        alert("La funcionalidad de cambio de contraseña estará disponible en la próxima actualización.");
+      });
+    }
   }
 
   // --- REPORTES LOGIC --- //
@@ -461,18 +496,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
       switch (tipoReporte) {
         case "inventario":
+          const counts = data.reduce((acc, p) => {
+            acc[p.categoria] = (acc[p.categoria] || 0) + p.cantidad;
+            return acc;
+          }, {});
+
           chartData = {
-            labels: data.map((p) => p.nombre),
+            labels: Object.keys(counts),
             datasets: [
               {
-                label: "Cantidad en Inventario",
-                data: data.map((p) => p.cantidad),
-                backgroundColor: "rgba(54, 162, 235, 0.6)",
-                borderColor: "rgba(54, 162, 235, 1)",
+                data: Object.values(counts),
+                backgroundColor: [
+                  "#36A2EB", "#FF6384", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"
+                ],
                 borderWidth: 1,
               },
             ],
           };
+          window.myChart = new Chart(ctx, {
+            type: "pie",
+            data: chartData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Distribución por Categoría' }
+              }
+            },
+          });
+          return; // Saltamos el constructor de barras genérico
           break;
         case "entradas":
         case "salidas":
@@ -780,7 +833,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function cargarUsuarios() {
       try {
-        const response = await fetch(`${API_BASE_URL}/usuarios`);
+        const response = await fetch(`${API_BASE_URL}/usuarios`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
         if (!response.ok) throw new Error("Error al cargar usuarios");
         const usuarios = await response.json();
         renderizarUsuarios(usuarios);
@@ -830,7 +887,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(`${API_BASE_URL}/usuarios/${usuarioId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(updatedUsuario),
         });
         const result = await response.json();
@@ -848,7 +908,11 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleEditarUsuario(usuarioId) {
       try {
         const [userResponse, formHtmlResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/usuarios/${usuarioId}`),
+          fetch(`${API_BASE_URL}/usuarios/${usuarioId}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          }),
           fetch("usuarios.html"), // No necesita autenticación
         ]);
 
@@ -899,6 +963,9 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(`${API_BASE_URL}/usuarios/${usuarioId}`, {
           method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
         const result = await response.json();
         if (!response.ok)
@@ -939,7 +1006,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(`${API_BASE_URL}/usuarios`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(nuevoUsuario),
         });
         const result = await response.json();

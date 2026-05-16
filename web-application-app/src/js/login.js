@@ -58,16 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const raw = await response.text();
-      console.log("Login response status:", response.status, "raw:", raw);
-      let data;
-      try {
-        data = JSON.parse(raw);
-      } catch (e) {
-        console.error("La respuesta no es JSON válido", e);
-        showError("Respuesta inesperada del servidor. Revisa la consola.");
-        return;
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("El servidor no devolvió una respuesta válida (JSON).");
       }
+
+      const data = await response.json();
 
       if (response.ok) {
         // Login exitoso
